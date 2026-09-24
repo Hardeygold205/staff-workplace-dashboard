@@ -1,0 +1,77 @@
+<aside
+  class="flex h-full flex-col border-r border-line bg-surface-elevated transition-all duration-200"
+  [class.w-64]="!sidebar.collapsed()"
+  [class.w-[76px]]="sidebar.collapsed()">
+  <div class="flex h-16 items-center gap-2 border-b border-line px-4">
+    @if (!sidebar.collapsed()) {
+      @if (theme.theme() === "dark") {
+        <img
+          src="assets/logo-white.png"
+          alt="Extension Africa"
+          class="h-10 w-auto" />
+      } @else {
+        <img
+          src="assets/logo-black.png"
+          alt="Extension Africa"
+          class="h-10 w-auto" />
+      }
+    } @else {
+      <img
+        src="assets/logo-icon.png"
+        alt="Extension Africa"
+        class="mx-auto h-8 w-8" />
+    }
+  </div>
+
+  <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
+    @for (item of items; track item.route) {
+      @if (canSee(item)) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="bg-brand-green text-white"
+          [routerLinkActiveOptions]="{ exact: false }"
+          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-secondary transition hover:bg-surface-muted"
+          [class.justify-center]="sidebar.collapsed()"
+          [title]="sidebar.collapsed() ? item.label : ''">
+          <svg
+            class="h-5 w-5 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              [attr.d]="item.icon" />
+          </svg>
+          @if (!sidebar.collapsed()) {
+            <span>{{ item.label }}</span>
+          }
+        </a>
+      }
+    }
+  </nav>
+
+  <div class="border-t border-line p-3">
+    <button
+      type="button"
+      (click)="sidebar.toggle()"
+      class="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-ink-muted transition hover:bg-surface-muted hover:text-ink">
+      <svg
+        class="h-5 w-5 transition-transform"
+        [class.rotate-180]="sidebar.collapsed()"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+      </svg>
+      @if (!sidebar.collapsed()) {
+        <span class="text-xs font-medium">Collapse</span>
+      }
+    </button>
+  </div>
+</aside>

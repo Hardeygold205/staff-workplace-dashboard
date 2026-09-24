@@ -1,0 +1,136 @@
+<app-page-header
+  [title]="monthLabel()"
+  subtitle="Your attendance calendar — Sunday to Saturday, weekends blanked.">
+  <app-button variant="secondary" (click)="prevMonth()">← Prev</app-button>
+  <app-button variant="secondary" (click)="nextMonth()">Next →</app-button>
+</app-page-header>
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-4">
+  <app-card class="block lg:col-span-3">
+    @if (loading()) {
+      <app-spinner />
+    } @else {
+      <div
+        class="grid grid-cols-7 gap-1 text-center text-xs font-medium text-ink-muted">
+        <div>Sun</div>
+        <div>Mon</div>
+        <div>Tue</div>
+        <div>Wed</div>
+        <div>Thu</div>
+        <div>Fri</div>
+        <div>Sat</div>
+      </div>
+
+      <div class="mt-1 grid grid-cols-7 gap-1">
+        @for (cell of cells(); track $index) {
+          @if (cell === null) {
+            <div></div>
+          } @else {
+            <div [class]="cellClasses(cell)" class="group">
+              <!-- Always-visible Day Number & Attendance Status -->
+              <div class="flex items-center justify-between">
+                <p
+                  class="text-xs font-semibold"
+                  [class.text-ink-muted]="cell.isWeekend"
+                  [class.text-ink]="!cell.isWeekend">
+                  {{ cell.day }}
+                </p>
+
+                @if (!cell.isWeekend && statusLabel(cell.status)) {
+                  <span
+                    class="text-[9px] font-medium uppercase tracking-wider text-ink-secondary">
+                    {{ statusLabel(cell.status) }}
+                  </span>
+                }
+              </div>
+
+              <!-- Events/Items Section -->
+              <div class="mt-1.5 space-y-1">
+                @for (event of cell.events.slice(0, 1); track event.id) {
+                  <p
+                    class="truncate rounded bg-brand-cream/80 px-1 py-0.5 text-[10px] font-medium text-brand-green border border-brand-cream">
+                    📅 {{ event.title }}
+                  </p>
+                }
+                @for (item of cell.items.slice(0, 1); track item.id) {
+                  <p
+                    class="truncate rounded bg-blue-100/80 px-1 py-0.5 text-[10px] font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
+                    📌 {{ item.title }}
+                  </p>
+                }
+                @if (cell.events.length + cell.items.length > 1) {
+                  <p class="text-[9px] font-medium text-ink-muted">
+                    +{{ cell.events.length + cell.items.length - 1 }} more
+                  </p>
+                }
+              </div>
+
+              <!-- Hover Tooltip Popup -->
+              @if (cell.events.length > 0 || cell.items.length > 0) {
+                <div
+                  class="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 hidden w-48 -translate-x-1/2 rounded-lg border border-line bg-surface p-2 shadow-xl group-hover:block">
+                  <p
+                    class="mb-1 text-[11px] font-semibold text-ink border-b border-line pb-1">
+                    {{ cell.dateKey }} Events & Items
+                  </p>
+                  <ul class="space-y-1 max-h-32 overflow-y-auto">
+                    @for (e of cell.events; track e.id) {
+                      <li class="text-[10px] text-brand-green font-medium">
+                        • {{ e.title }}
+                      </li>
+                    }
+                    @for (i of cell.items; track i.id) {
+                      <li
+                        class="text-[10px] text-blue-600 dark:text-blue-400 font-medium">
+                        • {{ i.title }} ({{ i.type }})
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Legend -->
+      <div class="mt-4 flex flex-wrap gap-3 text-xs text-ink-secondary">
+        <span class="flex items-center gap-1">
+          <span class="h-2.5 w-2.5 rounded-full bg-green-400"></span> Present
+        </span>
+        <span class="flex items-center gap-1">
+          <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Late /
+          Half Day
+        </span>
+        <span class="flex items-center gap-1">
+          <span class="h-2.5 w-2.5 rounded-full bg-blue-400"></span> Leave
+        </span>
+        <span class="flex items-center gap-1">
+          <span class="h-2.5 w-2.5 rounded-full bg-red-400"></span> Absent
+        </span>
+        <span class="flex items-center gap-1">
+          <span
+            class="h-2.5 w-2.5 rounded-full bg-surface-muted border border-line"></span>
+          Weekend
+        </span>
+      </div>
+    }
+  </app-card>
+
+  <app-card title="Upcoming Events" class="block">
+    @if (upcoming().length === 0) {
+      <p class="text-sm text-ink-muted">Nothing coming up.</p>
+    } @else {
+      <div class="space-y-3">
+        @for (event of upcoming(); track event.id) {
+          <div>
+            <p class="text-sm font-medium text-ink">{{ event.title }}</p>
+            <p class="text-xs text-ink-muted">
+              {{ event.startsAt | date: "MMM d, y" }}
+            </p>
+          </div>
+        }
+      </div>
+    }
+  </app-card>
+</div>

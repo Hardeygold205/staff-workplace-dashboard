@@ -1,0 +1,353 @@
+<app-page-header
+  title="Staff Directory"
+  subtitle="Manage staff accounts, department assignments, and permission overrides.">
+  @if (auth.hasPermission("users:create")) {
+    <app-button (click)="openCreateForm()">+ Add Staff</app-button>
+  }
+</app-page-header>
+
+<!-- Summary Cards & Search Bar -->
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+  <app-card class="block">
+    <p class="text-xs font-medium text-ink-muted uppercase tracking-wider">
+      Total Staff
+    </p>
+    <p class="mt-1 text-2xl font-semibold text-ink">{{ users().length }}</p>
+  </app-card>
+  <app-card class="block">
+    <p class="text-xs font-medium text-ink-muted uppercase tracking-wider">
+      Active Accounts
+    </p>
+    <p class="mt-1 text-2xl font-semibold text-brand-green">
+      {{ activeCount() }}
+    </p>
+  </app-card>
+  <app-card class="block">
+    <p class="text-xs font-medium text-ink-muted uppercase tracking-wider">
+      Exempt from Attendance
+    </p>
+    <p class="mt-1 text-2xl font-semibold text-amber-600">
+      {{ exemptCount() }}
+    </p>
+  </app-card>
+</div>
+
+<!-- Directory Card -->
+<app-card class="block">
+  <!-- Search & Filter Header -->
+  <div
+    class="mb-4 flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+    <div class="relative w-full max-w-xs sm:w-64">
+      <input
+        type="text"
+        placeholder="Search staff, email, dept..."
+        [value]="searchQuery()"
+        (input)="searchQuery.set($any($event.target).value)"
+        class="w-full rounded-lg border border-line bg-surface px-3 py-1.5 text-xs text-ink placeholder:text-ink-muted focus:border-brand-green focus:outline-none" />
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2">
+      <select
+        [value]="branchFilter()"
+        (change)="branchFilter.set($any($event.target).value)"
+        class="rounded-lg border border-line bg-surface px-2.5 py-1.5 text-xs text-ink">
+        <option value="ALL">All Branches</option>
+        <option value="ABUJA">Abuja</option>
+        <option value="KANO">Kano</option>
+      </select>
+
+      <select
+        [value]="statusFilter()"
+        (change)="statusFilter.set($any($event.target).value)"
+        class="rounded-lg border border-line bg-surface px-2.5 py-1.5 text-xs text-ink">
+        <option value="ALL">All Status</option>
+        <option value="ACTIVE">Active</option>
+        <option value="INACTIVE">Inactive</option>
+      </select>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <app-spinner />
+  } @else if (filteredUsers().length === 0) {
+    <div class="py-12 text-center text-xs text-ink-muted">
+      No staff members found matching your search.
+    </div>
+  } @else {
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead>
+          <tr class="border-b border-line text-ink-muted">
+            <th class="py-3 pr-4 font-medium">Staff Member</th>
+            <th class="py-3 pr-4 font-medium">Role(s)</th>
+            <th class="py-3 pr-4 font-medium">Department & Position</th>
+            <th class="py-3 pr-4 font-medium">Branch / Shift</th>
+            <th class="py-3 pr-4 font-medium">Status</th>
+            <th class="py-3 pr-4 text-right font-medium">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          @for (user of filteredUsers(); track user.id) {
+            <tr class="hover:bg-surface-muted/50 transition-colors">
+              <td class="py-3 pr-4">
+                <div class="flex items-center gap-2.5">
+                  <app-avatar
+                    [src]="user.avatarUrl"
+                    [name]="displayName(user)"
+                    [size]="32" />
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <p class="font-semibold text-ink">
+                        {{ displayName(user) }}
+                      </p>
+                      @if (user.attendanceExempt) {
+                        <span
+                          class="rounded bg-amber-100 px-1 py-0.5 text-[9px] font-semibold text-amber-800 dark:bg-amber-900/40 dark:text-amber-300">
+                          Exempt
+                        </span>
+                      }
+                    </div>
+                    <p class="text-[11px] text-ink-muted">{{ user.email }}</p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-3 pr-4">
+                <div class="flex flex-wrap gap-1">
+                  @for (role of roleNames(user); track role) {
+                    <app-badge tone="brand">{{ role }}</app-badge>
+                  }
+                </div>
+              </td>
+              <td class="py-3 pr-4 text-ink-secondary">
+                <p class="font-medium text-ink">{{ user.department || "—" }}</p>
+                <p class="text-[11px] text-ink-muted">
+                  {{ user.position || "—" }}
+                </p>
+              </td>
+              <td class="py-3 pr-4 text-ink-secondary">
+                <p class="font-medium">{{ user.officeBranch }}</p>
+                <span
+                  class="text-[10px] text-ink-muted uppercase tracking-wider"
+                  >{{ user.shift }}</span
+                >
+              </td>
+              <td class="py-3 pr-4">
+                <app-badge [tone]="user.isActive ? 'success' : 'neutral'">
+                  {{ user.isActive ? "Active" : "Inactive" }}
+                </app-badge>
+              </td>
+              <td class="py-3 pr-4 text-right">
+                <div class="flex items-center justify-end gap-2">
+                  <!-- @if (auth.hasPermission("attendance:manage_exemption")) {
+                    <button
+                      type="button"
+                      (click)="toggleExemption(user)"
+                      class="text-ink-secondary hover:text-ink font-medium hover:underline">
+                      {{ user.attendanceExempt ? "Un-exempt" : "Exempt" }}
+                    </button>
+                  } -->
+                  @if (auth.hasPermission("users:manage_permissions")) {
+                    <button
+                      type="button"
+                      (click)="openPermissions(user)"
+                      class="font-medium text-brand-green hover:underline">
+                      Permissions
+                    </button>
+                  }
+                  @if (auth.hasPermission("users:manage")) {
+                    <button
+                      type="button"
+                      (click)="resetPassword(user)"
+                      class="text-ink-secondary hover:text-ink font-medium hover:underline">
+                      Reset PW
+                    </button>
+                    @if (user.isActive) {
+                      <button
+                        type="button"
+                        (click)="deactivate(user)"
+                        class="font-medium text-red-500 hover:underline">
+                        Deactivate
+                      </button>
+                    }
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</app-card>
+
+<!-- Create Staff Modal -->
+<app-modal
+  [open]="showCreateForm()"
+  title="Add Staff Member"
+  (close)="showCreateForm.set(false)">
+  <form [formGroup]="createForm" (ngSubmit)="submitCreate()" class="space-y-3">
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >First name</label
+        >
+        <input
+          formControlName="firstName"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+      </div>
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Last name</label
+        >
+        <input
+          formControlName="lastName"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+      </div>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary"
+        >Company email</label
+      >
+      <input
+        formControlName="email"
+        placeholder="a.user@extensionafrica.com"
+        class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Department</label
+        >
+        <input
+          formControlName="department"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+      </div>
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Position</label
+        >
+        <input
+          formControlName="position"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Office Branch</label
+        >
+        <select
+          formControlName="officeBranch"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+          <option value="ABUJA">Abuja</option>
+          <option value="KANO">Kano</option>
+        </select>
+      </div>
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Shift</label
+        >
+        <select
+          formControlName="shift"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+          <option value="ONSITE">Onsite</option>
+          <option value="HYBRID">Hybrid</option>
+          <option value="REMOTE">Remote</option>
+        </select>
+      </div>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary"
+        >Assign Role(s)</label
+      >
+      <div class="flex flex-wrap gap-2">
+        @for (role of roles(); track role.id) {
+          <label
+            class="flex items-center gap-1.5 rounded-lg border border-line px-2.5 py-1 text-xs text-ink cursor-pointer hover:bg-surface-muted">
+            <input
+              type="checkbox"
+              (change)="
+                toggleRoleSelection(role.name, $any($event.target).checked)
+              " />
+            {{ role.name }}
+          </label>
+        }
+      </div>
+    </div>
+    @if (error()) {
+      <p
+        class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+        {{ error() }}
+      </p>
+    }
+    <p class="text-xs text-ink-muted">
+      A temporary password is generated and emailed automatically.
+    </p>
+    <app-button type="submit" [fullWidth]="true" [loading]="submitting()">
+      Create Account
+    </app-button>
+  </form>
+</app-modal>
+
+<!-- Fixed Permissions Modal -->
+@if (permissionsTarget(); as target) {
+  <app-modal
+    [open]="true"
+    [title]="'Permissions — ' + displayName(target)"
+    (close)="permissionsTarget.set(null)">
+    <p class="mb-3 text-xs text-ink-secondary">
+      Grants add access beyond their role(s); revokes remove access even if a
+      role would normally give it.
+    </p>
+
+    <div class="max-h-72 space-y-1.5 overflow-y-auto pr-1">
+      @for (perm of allPermissions(); track perm.key) {
+        <div
+          class="flex items-center justify-between rounded-lg border border-line/60 bg-surface px-3 py-2 text-xs">
+          <div>
+            <p class="font-medium text-ink">{{ perm.key }}</p>
+            @if (perm.description) {
+              <p class="text-[10px] text-ink-muted">{{ perm.description }}</p>
+            }
+          </div>
+
+          <div class="flex items-center gap-3">
+            <label
+              class="flex items-center gap-1 font-medium text-emerald-600 dark:text-emerald-400 cursor-pointer">
+              <input
+                type="checkbox"
+                [checked]="isGranted(perm.key)"
+                (change)="toggleGrant(perm.key, $any($event.target).checked)" />
+              Grant
+            </label>
+            <label
+              class="flex items-center gap-1 font-medium text-red-500 cursor-pointer">
+              <input
+                type="checkbox"
+                [checked]="isRevoked(perm.key)"
+                (change)="
+                  toggleRevoke(perm.key, $any($event.target).checked)
+                " />
+              Revoke
+            </label>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (error()) {
+      <p
+        class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+        {{ error() }}
+      </p>
+    }
+
+    <app-button
+      class="mt-4 block"
+      [fullWidth]="true"
+      [loading]="savingPermissions()"
+      (click)="savePermissions()">
+      Save Overrides
+    </app-button>
+  </app-modal>
+}

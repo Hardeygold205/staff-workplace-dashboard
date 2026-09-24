@@ -1,0 +1,126 @@
+<app-page-header
+  title="Suggestions"
+  subtitle="Ideas for improving how we work — vote on what matters to you.">
+  <app-button (click)="openForm()">New Suggestion</app-button>
+</app-page-header>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (suggestions().length === 0) {
+  <app-empty-state
+    title="No suggestions yet"
+    subtitle="Be the first to share an idea." />
+} @else {
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    @for (s of suggestions(); track s.id) {
+      <app-card>
+        <div class="flex items-start justify-between gap-2">
+          <div>
+            <h3 class="text-sm font-semibold text-ink">
+              {{ s.title || "Suggestion" }}
+            </h3>
+            <p class="mt-0.5 text-xs text-ink-muted">
+              By {{ s.isAnonymous || !s.author ? "Anonymous" : s.author.name }}
+            </p>
+          </div>
+          <app-badge [tone]="statusTone(s.status)">{{ s.status }}</app-badge>
+        </div>
+
+        <p class="mt-2 line-clamp-3 text-xs text-ink-secondary">
+          {{ s.content }}
+        </p>
+
+        <div
+          class="mt-4 flex items-center justify-between border-t border-line pt-3">
+          <!-- Like / Dislike Vote Buttons -->
+          <div class="flex items-center gap-1.5">
+            <button
+              type="button"
+              (click)="vote(s, 'LIKE')"
+              class="flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-xs font-medium text-ink transition hover:bg-surface-muted"
+              [ngClass]="{
+                'border-emerald-500 bg-emerald-500/10 text-emerald-600':
+                  s.myVote === 'LIKE',
+              }">
+              👍 <span>{{ s.likes }}</span>
+            </button>
+
+            <button
+              type="button"
+              (click)="vote(s, 'DISLIKE')"
+              class="flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-xs font-medium text-ink transition hover:bg-surface-muted"
+              [ngClass]="{
+                'border-rose-500 bg-rose-500/10 text-rose-600':
+                  s.myVote === 'DISLIKE',
+              }">
+              👎 <span>{{ s.dislikes }}</span>
+            </button>
+          </div>
+
+          <!-- Admin Status Dropdown -->
+          @if (auth.hasPermission("suggestions:manage")) {
+            <select
+              [ngModel]="s.status"
+              (ngModelChange)="setStatus(s, $event)"
+              class="rounded-lg border border-line bg-surface px-2 py-1 text-xs text-ink focus:outline-none focus:ring-1 focus:ring-primary">
+              @for (opt of statusOptions; track opt) {
+                <option [value]="opt">{{ opt }}</option>
+              }
+            </select>
+          }
+        </div>
+      </app-card>
+    }
+  </div>
+}
+
+<!-- Create Suggestion Modal -->
+<app-modal
+  [open]="showForm()"
+  title="New Suggestion"
+  (close)="showForm.set(false)">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4">
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary"
+        >Title</label
+      >
+      <input
+        formControlName="title"
+        placeholder="e.g. Upgrade office WiFi"
+        class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-1 focus:ring-primary" />
+    </div>
+
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary"
+        >Details</label
+      >
+      <textarea
+        formControlName="content"
+        rows="3"
+        placeholder="Describe your suggestion in detail..."
+        class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink focus:outline-none focus:ring-1 focus:ring-primary"></textarea>
+    </div>
+
+    <!-- Anonymous Toggle -->
+    <label class="flex items-center gap-2 cursor-pointer select-none">
+      <input
+        type="checkbox"
+        formControlName="isAnonymous"
+        class="h-4 w-4 rounded border-line text-primary focus:ring-primary" />
+      <span class="text-xs font-medium text-ink-secondary"
+        >Submit anonymously</span
+      >
+    </label>
+
+    @if (error()) {
+      <p
+        class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+        {{ error() }}
+      </p>
+    }
+
+    <app-button type="submit" [fullWidth]="true" [loading]="submitting()">
+      Submit Suggestion
+    </app-button>
+  </form>
+</app-modal>

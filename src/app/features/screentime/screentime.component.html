@@ -1,0 +1,50 @@
+<app-page-header title="Screentime" subtitle="Active time is only counted during work hours, excluding lunch break." />
+
+<app-card title="My Recent Activity" class="block">
+  @if (loading()) {
+    <app-spinner />
+  } @else if (mine().length === 0) {
+    <app-empty-state title="No screentime data yet" />
+  } @else {
+    <div class="space-y-3">
+      @for (log of mine(); track log.id) {
+        <div>
+          <div class="mb-1 flex items-center justify-between text-sm">
+            <span class="text-ink">{{ log.date | date: 'MMM d, y' }}</span>
+            <span class="text-ink-secondary">{{ hours(log.activeSeconds) }} active</span>
+          </div>
+          <div class="h-2 overflow-hidden rounded-full bg-surface-muted">
+            <div class="h-full bg-brand-green" [style.width.%]="activePercent(log)"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</app-card>
+
+@if (auth.hasPermission('attendance:view_all') && all().length > 0) {
+  <app-card title="Team Screentime" class="mt-6 block">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-line text-xs text-ink-muted">
+            <th class="py-2 pr-4 font-medium">Staff</th>
+            <th class="py-2 pr-4 font-medium">Date</th>
+            <th class="py-2 pr-4 font-medium">Active</th>
+            <th class="py-2 pr-4 font-medium">Idle</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          @for (log of all(); track log.id) {
+            <tr>
+              <td class="py-2 pr-4 text-ink">{{ log.user?.firstName }} {{ log.user?.lastName }}</td>
+              <td class="py-2 pr-4 text-ink-secondary">{{ log.date | date: 'MMM d' }}</td>
+              <td class="py-2 pr-4 text-ink-secondary">{{ hours(log.activeSeconds) }}</td>
+              <td class="py-2 pr-4 text-ink-secondary">{{ hours(log.idleSeconds) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </app-card>
+}

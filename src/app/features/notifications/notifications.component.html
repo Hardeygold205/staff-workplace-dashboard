@@ -1,0 +1,37 @@
+<app-page-header title="Notifications">
+  <app-button variant="secondary" (click)="markAllRead()"
+    >Mark all as read</app-button
+  >
+</app-page-header>
+
+<app-card class="block">
+  @if (loading()) {
+    <app-spinner />
+  } @else if (notifications().length === 0) {
+    <app-empty-state title="You're all caught up" />
+  } @else {
+    <div class="divide-y divide-line">
+      @for (n of notifications(); track n.id) {
+        <a
+          [routerLink]="n.link ? null : null"
+          (click)="markRead(n)"
+          class="block cursor-pointer py-3 transition hover:bg-surface-muted"
+          [class.opacity-60]="n.isRead">
+          <div class="flex items-start justify-between gap-2 px-1">
+            <div>
+              <p class="text-sm font-medium text-ink">{{ n.title }}</p>
+              <p class="text-xs text-ink-secondary">{{ n.message }}</p>
+            </div>
+            @if (!n.isRead) {
+              <span
+                class="mt-1 h-2 w-2 shrink-0 rounded-full bg-brand-green"></span>
+            }
+          </div>
+          <p class="mt-1 px-1 text-xs text-ink-muted">
+            {{ n.createdAt | date: "MMM d, h:mm a" }}
+          </p>
+        </a>
+      }
+    </div>
+  }
+</app-card>

@@ -1,0 +1,76 @@
+<app-page-header title="Uploads" subtitle="Documents, images, audio, and video — attach them to a project, task, or request, or upload standalone." />
+
+<app-card class="mb-6 block">
+  <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Folder (optional)</label>
+      <select [(ngModel)]="selectedFolder" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+        <option value="">No folder (standalone)</option>
+        @for (folder of folders; track folder) {
+          <option [value]="folder">{{ folder }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Owner/Entity ID (optional)</label>
+      <input
+        [(ngModel)]="entityId"
+        placeholder="e.g. the project or request ID"
+        class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink"
+      />
+    </div>
+  </div>
+
+  <label
+    class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition"
+    [class.border-brand-green]="dragOver()"
+    [class.border-line]="!dragOver()"
+    (dragover)="$event.preventDefault(); dragOver.set(true)"
+    (dragleave)="dragOver.set(false)"
+    (drop)="onDrop($event)"
+  >
+    <input type="file" multiple class="hidden" (change)="onFileSelected($event)" />
+    <svg class="mb-2 h-8 w-8 text-ink-muted" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3-3m0 0l3 3m-3-3v8" />
+    </svg>
+    <p class="text-sm font-medium text-ink">Drop files here, or click to browse</p>
+    <p class="mt-1 text-xs text-ink-muted">Docs, images, audio, and video — up to 500MB each</p>
+    @if (uploading()) {
+      <p class="mt-2 text-xs text-brand-green">Uploading…</p>
+    }
+  </label>
+
+  @if (error()) {
+    <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">{{ error() }}</p>
+  }
+</app-card>
+
+<app-card title="Files" class="block">
+  @if (loading()) {
+    <app-spinner />
+  } @else if (uploads().length === 0) {
+    <app-empty-state title="No files yet" />
+  } @else {
+    <div class="divide-y divide-line">
+      @for (file of uploads(); track file.id) {
+        <div class="flex items-center justify-between py-3">
+          <div class="flex items-center gap-3">
+            <span class="text-xl">{{ fileIcon(file.mimeType) }}</span>
+            <div>
+              <p class="text-sm font-medium text-ink">{{ file.originalName }}</p>
+              <p class="text-xs text-ink-muted">
+                {{ formatSize(file.sizeBytes) }}
+                @if (file.entityType) { · {{ file.entityType }} }
+                · {{ file.createdAt | date: 'MMM d, y' }}
+              </p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button type="button" (click)="download(file)" class="text-xs font-medium text-brand-green hover:underline">Download</button>
+            <button type="button" (click)="remove(file)" class="text-xs font-medium text-red-500 hover:underline">Delete</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</app-card>

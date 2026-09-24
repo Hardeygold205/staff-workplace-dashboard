@@ -1,0 +1,57 @@
+<header class="flex h-16 items-center justify-between border-b border-line bg-surface-elevated px-4 sm:px-6">
+  <div class="flex items-center gap-3">
+    <button type="button" class="rounded-lg p-2 text-ink-secondary hover:bg-surface-muted lg:hidden" (click)="sidebar.toggleMobile()">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="flex items-center gap-2 sm:gap-4">
+    <button
+      type="button"
+      (click)="theme.toggle()"
+      class="rounded-lg p-2 text-ink-secondary transition hover:bg-surface-muted"
+      title="Toggle theme"
+    >
+      @if (theme.theme() === 'dark') {
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.36 6.36l-.7-.7M6.34 6.34l-.7-.7m12.02 0l-.7.7M6.34 17.66l-.7.7M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+      } @else {
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+      }
+    </button>
+
+    <a routerLink="/notifications" class="relative rounded-lg p-2 text-ink-secondary transition hover:bg-surface-muted">
+      <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4a2 2 0 01-.6-1.4V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+      @if (notifications.unreadCount() > 0) {
+        <span class="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-semibold text-white">
+          {{ notifications.unreadCount() > 9 ? '9+' : notifications.unreadCount() }}
+        </span>
+      }
+    </a>
+
+    <div class="relative">
+      <button type="button" class="flex items-center gap-2 rounded-lg p-1 hover:bg-surface-muted" (click)="menuOpen.set(!menuOpen())">
+        <app-avatar [src]="me()?.avatarUrl" [name]="me() ? displayName(me()!) : ''" [size]="32" />
+        <span class="hidden text-sm font-medium text-ink sm:block">{{ me() ? displayName(me()!) : '' }}</span>
+      </button>
+
+      @if (menuOpen()) {
+        <div class="absolute right-0 z-20 mt-2 w-48 rounded-lg border border-line bg-surface-elevated py-1 shadow-lg">
+          <button type="button" (click)="goToProfile()" class="block w-full px-4 py-2 text-left text-sm text-ink hover:bg-surface-muted">
+            My Profile
+          </button>
+          <button type="button" (click)="logout()" class="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-surface-muted">
+            Log out
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</header>

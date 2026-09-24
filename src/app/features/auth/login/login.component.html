@@ -1,0 +1,63 @@
+<div class="flex min-h-screen items-center justify-center bg-white dark:bg-black px-4 ">
+  <div class="w-full max-w-sm overflow-y-auto">
+    <div class="mb-8 flex justify-center">
+      @if (theme.theme() === "dark") {
+        <img
+          src="assets/logo-white.png"
+          alt="Extension Africa"
+          class="h-10 w-auto" />
+      } @else {
+        <img
+          src="assets/logo-black.png"
+          alt="Extension Africa"
+          class="h-10 w-auto" />
+      }
+    </div>
+
+    <div class="rounded-2xl bg-surface-elevated p-8 shadow-xl">
+      <h1 class="text-lg font-semibold text-ink">Welcome back</h1>
+      <p class="mt-1 text-sm text-ink-secondary">
+        Sign in to your EXAF Workplace account.
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary"
+            >Work email</label
+          >
+          <input
+            type="email"
+            formControlName="email"
+            placeholder="a.surajudeen@extensionafrica.com"
+            class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green" />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary"
+            >Password</label
+          >
+          <input
+            type="password"
+            formControlName="password"
+            class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green" />
+        </div>
+
+        @if (error()) {
+          <p
+            class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+            {{ error() }}
+          </p>
+        }
+
+        <app-button type="submit" [fullWidth]="true" [loading]="submitting()"
+          >Sign in</app-button
+        >
+      </form>
+    </div>
+
+    <p class="mt-6 text-center text-xs text-ink-muted">
+      No accounts are self-registered. <br />
+      contact HR if you need access.
+    </p>
+  </div>
+</div>

@@ -1,0 +1,125 @@
+@if (loading()) {
+  <app-spinner [size]="32" />
+} @else {
+  <div class="mb-6">
+    <h1 class="text-xl font-semibold text-ink">
+      Welcome back{{ me() ? ", " + me()!.firstName : "" }} 👋
+    </h1>
+    <p class="mt-1 text-sm text-ink-secondary">
+      Here's what's happening today.
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+    <!-- Attendance status -->
+    <app-card title="Today's Attendance">
+      @if (todaysAttendance()) {
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-ink-secondary">Checked in</p>
+            <p class="text-lg font-semibold text-ink">
+              {{ todaysAttendance()!.checkInAt | date: "shortTime" : "+0100" }}
+            </p>
+          </div>
+          <app-badge
+            [tone]="
+              todaysAttendance()!.status === 'LATE' ? 'warning' : 'success'
+            ">
+            {{ todaysAttendance()!.status }}
+          </app-badge>
+        </div>
+        @if (todaysAttendance()!.checkOutAt) {
+          <p class="mt-3 text-xs text-ink-muted">
+            Checked out at
+            {{ todaysAttendance()!.checkOutAt | date: "shortTime" : "+0100" }}
+          </p>
+        } @else {
+          <a
+            routerLink="/attendance"
+            class="mt-3 inline-block text-xs font-medium text-brand-green hover:underline">
+            Go check out →
+          </a>
+        }
+      } @else {
+        <p class="text-sm text-ink-secondary">You haven't checked in today.</p>
+        <a
+          routerLink="/attendance"
+          class="mt-2 inline-block text-xs font-medium text-brand-green hover:underline">
+          Check in now →
+        </a>
+      }
+    </app-card>
+
+    <!-- My requests -->
+    <app-card title="My Requests">
+      <div class="flex items-center justify-between">
+        <p class="text-sm text-ink-secondary">Pending approval</p>
+        <p class="text-2xl font-semibold text-ink">
+          {{ pendingRequestsCount }}
+        </p>
+      </div>
+      <a
+        routerLink="/requests"
+        class="mt-3 inline-block text-xs font-medium text-brand-green hover:underline">
+        View all requests →
+      </a>
+    </app-card>
+
+    <!-- Upcoming events -->
+    <app-card title="Upcoming Events">
+      @if (upcomingEvents().length === 0) {
+        <p class="text-sm text-ink-muted">Nothing on the calendar soon.</p>
+      } @else {
+        <ul class="space-y-2">
+          @for (event of upcomingEvents(); track event.id) {
+            <li class="flex items-center justify-between text-sm">
+              <span class="text-ink">{{ event.title }}</span>
+              <span class="text-xs text-ink-muted">{{
+                event.startsAt | date: "MMM d"
+              }}</span>
+            </li>
+          }
+        </ul>
+      }
+      <a
+        routerLink="/calendar"
+        class="mt-3 inline-block text-xs font-medium text-brand-green hover:underline">
+        View calendar →
+      </a>
+    </app-card>
+  </div>
+
+  <!-- Recent requests table -->
+  <app-card title="Recent Request Activity" class="mt-6 block">
+    @if (myRequests().length === 0) {
+      <app-empty-state
+        title="No requests yet"
+        subtitle="Submit a leave, travel, or equipment request to see it here." />
+    } @else {
+      <div class="divide-y divide-line">
+        @for (req of myRequests(); track req.id) {
+          <div class="flex items-center justify-between py-3">
+            <div>
+              <p class="text-sm font-medium text-ink">{{ req.subject }}</p>
+              <p class="text-xs text-ink-muted">
+                {{ req.category }} · {{ req.createdAt | date: "MMM d, y" }}
+              </p>
+            </div>
+            <app-badge
+              [tone]="
+                req.status === 'APPROVED'
+                  ? 'success'
+                  : req.status === 'REJECTED'
+                    ? 'danger'
+                    : req.status === 'CANCELLED'
+                      ? 'neutral'
+                      : 'warning'
+              ">
+              {{ req.status }}
+            </app-badge>
+          </div>
+        }
+      </div>
+    }
+  </app-card>
+}

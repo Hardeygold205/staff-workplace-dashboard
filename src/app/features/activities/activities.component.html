@@ -1,0 +1,116 @@
+<app-page-header
+  [title]="viewMode() === 'ALL' ? 'System Activity Log' : 'My Activity Log'"
+  subtitle="A running timeline of platform operations, security events, and audit traces.">
+</app-page-header>
+
+<!-- Header Tabs & Filter Bar -->
+<div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+  @if (canViewAll()) {
+    <div class="inline-flex rounded-lg border border-line bg-surface p-1">
+      <button
+        type="button"
+        (click)="switchViewMode('ALL')"
+        [class.bg-brand-cream]="viewMode() === 'ALL'"
+        [class.text-brand-green]="viewMode() === 'ALL'"
+        [class.text-ink-secondary]="viewMode() !== 'ALL'"
+        class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors hover:text-ink">
+        All Staff Activity
+      </button>
+      <button
+        type="button"
+        (click)="switchViewMode('MINE')"
+        [class.bg-brand-cream]="viewMode() === 'MINE'"
+        [class.text-brand-green]="viewMode() === 'MINE'"
+        [class.text-ink-secondary]="viewMode() !== 'MINE'"
+        class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors hover:text-ink">
+        My Activity
+      </button>
+    </div>
+  } @else {
+    <div class="text-xs font-semibold text-ink-muted uppercase tracking-wider">
+      Personal Audit Trail
+    </div>
+  }
+
+  @if (meta(); as m) {
+    <span class="text-xs text-ink-muted">
+      Showing {{ logs().length }} of {{ m.total }} records
+    </span>
+  }
+</div>
+
+<!-- Main Activity Timeline Card -->
+<app-card class="block">
+  @if (loading()) {
+    <div class="py-12">
+      <app-spinner />
+    </div>
+  } @else if (logs().length === 0) {
+    <app-empty-state
+      title="No activity recorded"
+      subtitle="Actions performed on the platform will appear here." />
+  } @else {
+    <div class="divide-y divide-line">
+      @for (log of logs(); track log.id) {
+        <div class="py-3.5 transition-colors hover:bg-surface-muted/40">
+          <div class="flex items-start justify-between gap-3">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <app-badge [tone]="getActionTone(log.action)">
+                  {{ log.action }}
+                </app-badge>
+                <p class="text-xs font-medium text-ink">
+                  {{ log.description }}
+                </p>
+              </div>
+
+              <div
+                class="flex flex-wrap items-center gap-2 text-[11px] text-ink-muted">
+                @if (log.user) {
+                  <span class="font-medium text-ink-secondary">
+                    👤 {{ log.user.firstName }} {{ log.user.lastName }}
+                  </span>
+                  <span>·</span>
+                }
+                @if (log.ipAddress) {
+                  <span
+                    class="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[10px] text-ink-secondary border border-line">
+                    IP: {{ log.ipAddress }}
+                  </span>
+                }
+              </div>
+            </div>
+
+            <span class="whitespace-nowrap text-xs text-ink-muted">
+              {{ log.createdAt | date: "MMM d, y · h:mm a" }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Pagination Footer -->
+    @if (meta(); as m) {
+      <div
+        class="mt-4 flex items-center justify-between border-t border-line pt-3">
+        <p class="text-xs text-ink-muted">
+          Page {{ m.page }} of {{ m.totalPages }}
+        </p>
+        <div class="flex gap-2">
+          <app-button
+            variant="secondary"
+            [disabled]="page() <= 1 || loading()"
+            (click)="prevPage()">
+            ← Prev
+          </app-button>
+          <app-button
+            variant="secondary"
+            [disabled]="page() >= m.totalPages || loading()"
+            (click)="nextPage()">
+            Next →
+          </app-button>
+        </div>
+      </div>
+    }
+  }
+</app-card>

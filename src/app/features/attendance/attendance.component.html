@@ -1,0 +1,266 @@
+<app-page-header
+  title="Attendance"
+  subtitle="Check in by 9:00am and check out by 5:00pm, WAT." />
+
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <!-- Check-in/out card -->
+  <app-card title="Today" class="block lg:col-span-1">
+    @if (isExempt()) {
+      <div
+        class="flex items-start gap-2 rounded-lg bg-brand-cream px-3 py-3 text-brand-green">
+        <svg
+          class="mt-0.5 h-4 w-4 shrink-0"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <p class="text-sm">
+          You're marked present by default and don't need to check in or out
+          daily. You can still check in voluntarily below if you'd like to track
+          your own time.
+        </p>
+      </div>
+    }
+    @if (loading()) {
+      <app-spinner />
+    } @else {
+      @if (error()) {
+        <p
+          class="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+          {{ error() }}
+        </p>
+      }
+
+      @if (!todaysRecord()) {
+        <p class="mb-3 text-sm text-ink-secondary">
+          You haven't checked in today.
+        </p>
+        <app-button
+          [fullWidth]="true"
+          [loading]="submitting()"
+          (click)="checkIn()"
+          >Check In</app-button
+        >
+      } @else if (!todaysRecord()!.checkOutAt) {
+        <div class="mb-4">
+          <p class="text-xs text-ink-muted">Checked in</p>
+          <p class="text-base font-semibold text-ink">
+            {{ todaysRecord()!.checkInAt | date: "shortTime" : "+0100" }}
+          </p>
+          <app-badge class="mt-1" [tone]="statusTone(todaysRecord()!.status)">{{
+            todaysRecord()!.status
+          }}</app-badge>
+        </div>
+
+        @if (needsCheckoutReason()) {
+          <div class="mb-3 space-y-2 rounded-lg bg-surface-muted p-3">
+            <p class="text-xs font-medium text-ink-secondary">
+              It's outside the normal 5–6pm checkout window — please pick a
+              reason:
+            </p>
+            <select
+              [ngModel]="selectedReason()"
+              (ngModelChange)="selectedReason.set($event)"
+              class="w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-ink">
+              <option value="">Select a reason…</option>
+              @for (opt of reasonOptions(); track opt.value) {
+                <option [value]="opt.value">{{ opt.label }}</option>
+              }
+            </select>
+            @if (selectedReason() === "OTHER") {
+              <textarea
+                [ngModel]="reasonText()"
+                (ngModelChange)="reasonText.set($event)"
+                rows="2"
+                placeholder="Add a short note…"
+                class="w-full rounded-lg border border-line bg-surface px-2 py-1.5 text-sm text-ink"></textarea>
+            }
+          </div>
+        }
+
+        <app-button
+          [fullWidth]="true"
+          [loading]="submitting()"
+          (click)="checkOut()"
+          >Check Out</app-button
+        >
+      } @else {
+        <div class="space-y-2">
+          <div>
+            <p class="text-xs text-ink-muted">Checked in</p>
+            <p class="text-sm font-medium text-ink">
+              {{ todaysRecord()!.checkInAt | date: "shortTime" : "+0100" }}
+            </p>
+          </div>
+          <div>
+            <p class="text-xs text-ink-muted">Checked out</p>
+            <p class="text-sm font-medium text-ink">
+              {{ todaysRecord()!.checkOutAt | date: "shortTime" : "+0100" }}
+            </p>
+          </div>
+          <app-badge [tone]="statusTone(todaysRecord()!.status)">{{
+            todaysRecord()!.status
+          }}</app-badge>
+          @if (todaysRecord()!.leftEarly) {
+            <app-badge tone="warning">Left Early</app-badge>
+          }
+          @if (todaysRecord()!.checkoutSource === "SYSTEM") {
+            <app-badge tone="danger">Auto-checked-out</app-badge>
+          }
+          @if (todaysRecord()!.reviewStatus === "PENDING_REVIEW") {
+            <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+              Awaiting review by HR.
+            </p>
+          }
+        </div>
+      }
+    }
+  </app-card>
+
+  <!-- History -->
+  <app-card title="My History" class="block lg:col-span-2">
+    @if (history().length === 0 && !loading()) {
+      <app-empty-state title="No attendance records yet" />
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-line text-xs text-ink-muted">
+              <th class="py-2 pr-4 font-medium">Date</th>
+              <th class="py-2 pr-4 font-medium">Check In</th>
+              <th class="py-2 pr-4 font-medium">Check Out</th>
+              <th class="py-2 pr-4 font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line">
+            @for (record of history(); track record.id) {
+              <tr>
+                <td class="py-2 pr-4 text-ink">
+                  {{ record.checkInAt | date: "MMM d, y" : "+0100" }}
+                </td>
+                <td class="py-2 pr-4 text-ink-secondary">
+                  {{ record.checkInAt | date: "shortTime" : "+0100" }}
+                </td>
+                <td class="py-2 pr-4 text-ink-secondary">
+                  {{
+                    record.checkOutAt
+                      ? (record.checkOutAt | date: "shortTime" : "+0100")
+                      : "—"
+                  }}
+                </td>
+                <td class="py-2 pr-4">
+                  <app-badge [tone]="statusTone(record.status)">{{
+                    record.status
+                  }}</app-badge>
+                  @if (record.leftEarly) {
+                    <app-badge tone="warning" class="ml-1">Early</app-badge>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-card>
+</div>
+
+<!-- Admin: pending review -->
+@if (auth.hasPermission("attendance:review") && pendingReview().length > 0) {
+  <app-card title="Awaiting Review" class="mt-6 block">
+    <div class="space-y-3">
+      @for (record of pendingReview(); track record.id) {
+        <div
+          class="flex flex-col gap-2 rounded-lg border border-line p-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p class="text-sm font-medium text-ink">
+              {{ record.user?.firstName }} {{ record.user?.lastName }}
+            </p>
+            <p class="text-xs text-ink-muted">
+              {{ record.checkInAt | date: "MMM d" : "+0100" }} —
+              @if (record.leftEarly) {
+                Left early
+              } @else {
+                Late check-in
+              }
+              @if (record.checkoutReasonType) {
+                · {{ record.checkoutReasonType }}
+              }
+            </p>
+            @if (record.checkoutReasonText) {
+              <p class="mt-1 text-xs italic text-ink-secondary">
+                "{{ record.checkoutReasonText }}"
+              </p>
+            }
+          </div>
+          <div class="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Optional note…"
+              [ngModel]="getNote(record.id)"
+              (ngModelChange)="setNote(record.id, $event)"
+              class="w-40 rounded-lg border border-line bg-surface px-2 py-1.5 text-xs text-ink" />
+            <app-button variant="secondary" (click)="markReviewed(record)"
+              >Mark Reviewed</app-button
+            >
+          </div>
+        </div>
+      }
+    </div>
+  </app-card>
+}
+
+<!-- Admin: everyone's attendance -->
+@if (auth.hasPermission("attendance:view_all")) {
+  <app-card title="Team Attendance" class="mt-6 block">
+    @if (adminLoading()) {
+      <app-spinner />
+    } @else {
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
+            <tr class="border-b border-line text-xs text-ink-muted">
+              <th class="py-2 pr-4 font-medium">Staff</th>
+              <th class="py-2 pr-4 font-medium">Date</th>
+              <th class="py-2 pr-4 font-medium">Check In</th>
+              <th class="py-2 pr-4 font-medium">Check Out</th>
+              <th class="py-2 pr-4 font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line">
+            @for (record of allRecords(); track record.id) {
+              <tr>
+                <td class="py-2 pr-4 text-ink">
+                  {{ record.user?.firstName }} {{ record.user?.lastName }}
+                </td>
+                <td class="py-2 pr-4 text-ink-secondary">
+                  {{ record.checkInAt | date: "MMM d" : "+0100" }}
+                </td>
+                <td class="py-2 pr-4 text-ink-secondary">
+                  {{ record.checkInAt | date: "shortTime" : "+0100" }}
+                </td>
+                <td class="py-2 pr-4 text-ink-secondary">
+                  {{
+                    record.checkOutAt
+                      ? (record.checkOutAt | date: "shortTime" : "+0100")
+                      : "—"
+                  }}
+                </td>
+                <td class="py-2 pr-4">
+                  <app-badge [tone]="statusTone(record.status)">{{
+                    record.status
+                  }}</app-badge>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </app-card>
+}

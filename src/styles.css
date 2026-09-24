@@ -1,0 +1,82 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-brand-green: #206542;
+  --color-brand-green-dark: #164a30;
+  --color-brand-black: #000000;
+  --color-brand-white: #ffffff;
+  --color-brand-cream: #fde6b6;
+
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-surface-muted: var(--surface-muted);
+  --color-line: var(--border-subtle);
+  --color-ink: var(--text-primary);
+  --color-ink-secondary: var(--text-secondary);
+  --color-ink-muted: var(--text-muted);
+  --color-accent: var(--accent);
+  --color-accent-contrast: var(--accent-contrast);
+}
+
+:root {
+  --surface: #ffffff;
+  --surface-elevated: #ffffff;
+  --surface-muted: #f4f5f4;
+  --border-subtle: #e5e7eb;
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+  --accent: var(--color-brand-green);
+  --accent-contrast: #ffffff;
+}
+
+.dark {
+  --surface: #0b0f0d;
+  --surface-elevated: #000000;
+  --surface-muted: #171d19;
+  --border-subtle: #232b26;
+  --text-primary: #f4f5f4;
+  --text-secondary: #b7bdb9;
+  --text-muted: #6b7570;
+  --accent: #2f8a5c;
+  --accent-contrast: #ffffff;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--surface);
+  color: var(--text-primary);
+  font-family:
+    "Poppins",
+    system-ui,
+    -apple-system,
+    Roboto,
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--border-subtle);
+  border-radius: 9999px;
+}
