@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "exaf-workplace-dashboard": {
+    "staff-platform-dashboard": {
       "projectType": "application",
       "root": "",
       "sourceRoot": "src",
@@ -12,18 +12,32 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/exaf-workplace-dashboard",
+            "outputPath": "dist/staff-platform-dashboard",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": ["zone.js"],
             "tsConfig": "tsconfig.app.json",
-            "assets": [{ "glob": "**/*", "input": "src/assets", "output": "assets" }],
+            "assets": [
+              { "glob": "**/*", "input": "src/assets", "output": "assets" }
+            ],
             "styles": ["src/styles.css"],
             "scripts": []
           },
           "configurations": {
             "production": {
-              "budgets": [{ "type": "initial", "maximumWarning": "1mb", "maximumError": "2mb" }],
+              "fileReplacements": [
+                {
+                  "replace": "src/app/environments/environment.ts",
+                  "with": "src/app/environments/environment.prod.ts"
+                }
+              ],
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1mb",
+                  "maximumError": "2mb"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
@@ -37,8 +51,12 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
-            "production": { "buildTarget": "exaf-workplace-dashboard:build:production" },
-            "development": { "buildTarget": "exaf-workplace-dashboard:build:development" }
+            "production": {
+              "buildTarget": "staff-platform-dashboard:build:production"
+            },
+            "development": {
+              "buildTarget": "staff-platform-dashboard:build:development"
+            }
           },
           "defaultConfiguration": "development"
         }

@@ -80,7 +80,9 @@ export class RegisterOrganizationComponent {
         },
         error: (err) => {
           this.submitting.set(false);
-          this.error.set(err?.error?.message ?? "Could not create the organization.");
+          this.error.set(
+            err?.error?.message ?? "Could not create the organization.",
+          );
         },
       });
   }
