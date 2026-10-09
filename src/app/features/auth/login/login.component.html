@@ -2,22 +2,16 @@
   <div class="w-full max-w-sm overflow-y-auto">
     <div class="mb-8 flex justify-center">
       @if (theme.theme() === "dark") {
-        <img
-          src="assets/logo-white.png"
-          alt="Extension Africa"
-          class="h-10 w-auto" />
+        <img src="assets/logo-light.svg" alt="Workplace" class="h-10 w-auto" />
       } @else {
-        <img
-          src="assets/logo-black.png"
-          alt="Extension Africa"
-          class="h-10 w-auto" />
+        <img src="assets/logo.svg" alt="Workplace" class="h-10 w-auto" />
       }
     </div>
 
     <div class="rounded-2xl bg-surface-elevated p-8 shadow-xl">
       <h1 class="text-lg font-semibold text-ink">Welcome back</h1>
       <p class="mt-1 text-sm text-ink-secondary">
-        Sign in to your EXAF Workplace account.
+        Sign in to your workplace account.
       </p>
 
       <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
@@ -28,7 +22,7 @@
           <input
             type="email"
             formControlName="email"
-            placeholder="a.surajudeen@extensionafrica.com"
+            placeholder="you@company.com"
             class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green" />
         </div>
 
@@ -56,8 +50,11 @@
     </div>
 
     <p class="mt-6 text-center text-xs text-ink-muted">
-      No accounts are self-registered. <br />
-      contact HR if you need access.
+      Have an invite?
+      <a routerLink="/accept-invitation" class="font-medium text-brand-green">Accept it</a>
+      <br />
+      Setting up a company?
+      <a routerLink="/register" class="font-medium text-brand-green">Create an organization</a>
     </p>
   </div>
 </div>

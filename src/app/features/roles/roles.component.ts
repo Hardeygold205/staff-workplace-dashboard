@@ -25,6 +25,7 @@ export class RolesComponent implements OnInit {
   editingRole = signal<Role | null>(null);
   editSelections = signal<Set<string>>(new Set());
   showCreateForm = signal(false);
+  createSelections = signal<Set<string>>(new Set());
   error = signal<string | null>(null);
 
   createForm = this.fb.nonNullable.group({
@@ -50,6 +51,7 @@ export class RolesComponent implements OnInit {
 
   openCreateForm(): void {
     this.createForm.reset({ name: '', description: '' });
+    this.createSelections.set(new Set());
     this.error.set(null);
     this.showCreateForm.set(true);
   }
@@ -60,12 +62,24 @@ export class RolesComponent implements OnInit {
       return;
     }
     const raw = this.createForm.getRawValue();
-    this.rolesService.create({ name: raw.name, description: raw.description || undefined }).subscribe({
+    this.rolesService.create({
+      name: raw.name,
+      description: raw.description || undefined,
+      permissionKeys: Array.from(this.createSelections()),
+    }).subscribe({
       next: () => {
         this.showCreateForm.set(false);
         this.load();
       },
       error: (err) => this.error.set(err?.error?.message ?? 'Could not create role.'),
+    });
+  }
+
+  toggleCreatePermission(key: string, checked: boolean): void {
+    this.createSelections.update((set) => {
+      const next = new Set(set);
+      checked ? next.add(key) : next.delete(key);
+      return next;
     });
   }
 

@@ -1,0 +1,158 @@
+<app-page-header
+  title="Organization"
+  subtitle="Company profile, logo, and icon. These show across the workplace for your staff." />
+
+@if (loading()) {
+  <app-spinner />
+} @else {
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <app-card title="Brand" class="block">
+      <div class="space-y-5">
+        <div>
+          <p class="mb-2 text-xs font-medium text-ink-secondary">Logo</p>
+          @if (org()?.logoUrl) {
+            <img [src]="org()!.logoUrl!" alt="Organization logo" class="mb-2 h-12 w-auto" />
+          } @else {
+            <p class="mb-2 text-xs text-ink-muted">No logo yet. A wide mark works best.</p>
+          }
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" (change)="onLogo($event)" />
+          @if (uploadingLogo()) {
+            <p class="mt-1 text-xs text-ink-muted">Uploading logo…</p>
+          }
+        </div>
+        <div>
+          <p class="mb-2 text-xs font-medium text-ink-secondary">Icon</p>
+          @if (org()?.iconUrl) {
+            <img [src]="org()!.iconUrl!" alt="Organization icon" class="mb-2 h-10 w-10 rounded-lg object-cover" />
+          } @else {
+            <p class="mb-2 text-xs text-ink-muted">Square icon for the collapsed sidebar.</p>
+          }
+          <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" (change)="onIcon($event)" />
+          @if (uploadingIcon()) {
+            <p class="mt-1 text-xs text-ink-muted">Uploading icon…</p>
+          }
+        </div>
+      </div>
+    </app-card>
+
+    <app-card title="Company details" class="block lg:col-span-2">
+      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-3">
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Name</label>
+            <input formControlName="name" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Legal name</label>
+            <input formControlName="legalName" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Industry</label>
+            <input formControlName="industry" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Staff size</label>
+            <select formControlName="staffRange" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+              <option value="">Select a range</option>
+              @for (range of staffRanges; track range) {
+                <option [value]="range">{{ range }} people</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Website</label>
+            <input formControlName="website" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Phone</label>
+            <input formControlName="phone" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Registration number</label>
+            <input formControlName="registrationNumber" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Timezone</label>
+            <input formControlName="timezone" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Country</label>
+            <input formControlName="country" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">State</label>
+            <input formControlName="state" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">City</label>
+            <input formControlName="city" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Address</label>
+            <input formControlName="address" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary">About</label>
+          <textarea formControlName="about" rows="3" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink"></textarea>
+        </div>
+        @if (error()) {
+          <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+        }
+        @if (saved()) {
+          <p class="text-xs text-brand-green">Organization saved.</p>
+        }
+        <app-button type="submit" [loading]="saving()">Save company details</app-button>
+      </form>
+    </app-card>
+  </div>
+
+  <app-card title="Workplace hours" class="mt-6 block">
+    <form [formGroup]="settingsForm" (ngSubmit)="saveSettings()" class="space-y-4">
+      <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary">Work starts</label>
+          <input type="time" formControlName="workStartTime" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary">Work ends</label>
+          <input type="time" formControlName="workEndTime" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary">Auto checkout</label>
+          <input type="time" formControlName="autoCheckoutTime" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+        </div>
+      </div>
+      <div>
+        <p class="mb-2 text-xs font-medium text-ink-secondary">Work days</p>
+        <div class="flex flex-wrap gap-2">
+          @for (day of dayLabels; track day.value) {
+            <button
+              type="button"
+              (click)="toggleDay(day.value)"
+              class="rounded-lg border px-3 py-1.5 text-xs"
+              [class.border-brand-green]="workDays().includes(day.value)"
+              [class.bg-brand-green]="workDays().includes(day.value)"
+              [class.text-white]="workDays().includes(day.value)"
+              [class.border-line]="!workDays().includes(day.value)"
+              [class.text-ink]="!workDays().includes(day.value)">
+              {{ day.label }}
+            </button>
+          }
+        </div>
+      </div>
+      <label class="flex items-center gap-2 text-sm text-ink">
+        <input type="checkbox" formControlName="enableSuggestions" />
+        Suggestions
+      </label>
+      <label class="flex items-center gap-2 text-sm text-ink">
+        <input type="checkbox" formControlName="enableScreentime" />
+        Screentime tracking
+      </label>
+      @if (settingsSaved()) {
+        <p class="text-xs text-brand-green">Workplace settings saved.</p>
+      }
+      <app-button type="submit" [loading]="savingSettings()">Save workplace settings</app-button>
+    </form>
+  </app-card>
+}

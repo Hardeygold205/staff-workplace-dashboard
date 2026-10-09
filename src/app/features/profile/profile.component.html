@@ -92,7 +92,11 @@
             </div>
 
             <div class="min-w-32.5">
-              @if (!todaysRecord()) {
+              @if (isExempt()) {
+                <app-badge tone="success" class="w-full justify-center py-1.5">
+                  Attendance exempt
+                </app-badge>
+              } @else if (!todaysRecord()) {
                 <app-button
                   [fullWidth]="true"
                   [loading]="submitting()"
@@ -121,7 +125,7 @@
           <div>
             <span class="block text-ink-muted">Department</span>
             <span class="font-medium text-ink">{{
-              user.department || "—"
+              placeName(user.department) || "—"
             }}</span>
           </div>
           <div>
@@ -131,7 +135,7 @@
           <div>
             <span class="block text-ink-muted">Branch</span>
             <span class="font-medium text-ink">{{
-              user.officeBranch || "—"
+              placeName(user.officeBranch) || "—"
             }}</span>
           </div>
           <div>
@@ -314,7 +318,11 @@
               </div>
             }
 
-            @if (!todaysRecord()) {
+            @if (isExempt()) {
+              <app-badge tone="success" class="w-full justify-center py-1.5">
+                Attendance exempt — check-in is not required
+              </app-badge>
+            } @else if (!todaysRecord()) {
               <app-button
                 [fullWidth]="true"
                 [loading]="submitting()"
@@ -471,7 +479,7 @@
             <div class="flex justify-between border-b border-line pb-2">
               <span class="text-ink-muted">Department</span>
               <span class="font-medium text-ink">{{
-                user.department || "Unassigned"
+                placeName(user.department) || "Unassigned"
               }}</span>
             </div>
             <div class="flex justify-between border-b border-line pb-2">
@@ -483,7 +491,7 @@
             <div class="flex justify-between border-b border-line pb-2">
               <span class="text-ink-muted">Office Branch</span>
               <span class="font-medium text-ink">{{
-                user.officeBranch || "Unassigned"
+                placeName(user.officeBranch) || "Unassigned"
               }}</span>
             </div>
             <div class="flex justify-between border-b border-line pb-2">

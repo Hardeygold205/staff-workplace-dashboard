@@ -1,0 +1,60 @@
+<app-page-header title="Departments" subtitle="Create the teams inside this organization. Projects and staff are assigned to these.">
+  @if (auth.hasPermission("departments:manage")) {
+    <app-button (click)="startCreate()">New department</app-button>
+  }
+</app-page-header>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (departments().length === 0) {
+  <app-card class="block">
+    <app-empty-state title="No departments yet" subtitle="Add Finance, Operations, Technology, or whatever this company uses." />
+  </app-card>
+} @else {
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+    @for (department of departments(); track department.id) {
+      <app-card [title]="department.name" class="block">
+        <div class="mb-3 flex items-center gap-2">
+          <app-badge [tone]="department.isActive ? 'success' : 'neutral'">{{ department.isActive ? "Active" : "Inactive" }}</app-badge>
+          <span class="text-xs text-ink-muted">{{ department._count?.users ?? 0 }} staff · {{ department._count?.projects ?? 0 }} projects</span>
+        </div>
+        <p class="mb-3 min-h-10 text-sm text-ink-secondary">{{ department.description || "No description" }}</p>
+        <p class="mb-4 text-xs text-ink-muted">
+          Head: {{ department.headUser ? department.headUser.firstName + " " + department.headUser.lastName : "Unassigned" }}
+        </p>
+        @if (auth.hasPermission("departments:manage") && department.isActive) {
+          <div class="flex gap-2">
+            <app-button variant="secondary" (click)="startEdit(department)">Edit</app-button>
+            <app-button variant="ghost" (click)="deactivate(department)">Deactivate</app-button>
+          </div>
+        }
+      </app-card>
+    }
+  </div>
+}
+
+<app-modal [open]="open()" [title]="editing() ? 'Edit department' : 'New department'" (close)="open.set(false)">
+  <form [formGroup]="form" (ngSubmit)="save()" class="space-y-3">
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Name</label>
+      <input formControlName="name" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Description</label>
+      <textarea formControlName="description" rows="3" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink"></textarea>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Department head</label>
+      <select formControlName="headUserId" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+        <option value="">No head yet</option>
+        @for (person of staff(); track person.id) {
+          <option [value]="person.id">{{ person.firstName }} {{ person.lastName }}</option>
+        }
+      </select>
+    </div>
+    @if (error()) {
+      <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+    }
+    <app-button type="submit" [fullWidth]="true" [loading]="saving()">Save department</app-button>
+  </form>
+</app-modal>

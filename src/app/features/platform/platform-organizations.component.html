@@ -1,0 +1,74 @@
+<app-page-header title="Organizations" subtitle="Staff counts, storage size, and account status. File contents stay inside each company." />
+
+<div class="mb-4 flex flex-wrap items-center gap-2">
+  <input
+    [ngModel]="search()"
+    (ngModelChange)="search.set($event)"
+    (keyup.enter)="applyFilters()"
+    placeholder="Search name, industry, country"
+    class="w-64 rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+  <select
+    [ngModel]="status()"
+    (ngModelChange)="status.set($event); applyFilters()"
+    class="rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+    <option value="all">All</option>
+    <option value="active">Active</option>
+    <option value="suspended">Suspended</option>
+  </select>
+  <app-button variant="secondary" (click)="applyFilters()">Search</app-button>
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else {
+  <div class="overflow-x-auto rounded-xl border border-line">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-surface-muted text-xs text-ink-muted">
+        <tr>
+          <th class="px-3 py-2 font-medium">Organization</th>
+          <th class="px-3 py-2 font-medium">Owner</th>
+          <th class="px-3 py-2 font-medium">Staff</th>
+          <th class="px-3 py-2 font-medium">Documents</th>
+          <th class="px-3 py-2 font-medium">Projects</th>
+          <th class="px-3 py-2 font-medium">Status</th>
+          <th class="px-3 py-2 font-medium"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line">
+        @for (org of items(); track org.id) {
+          <tr>
+            <td class="px-3 py-3">
+              <a [routerLink]="['/platform/organizations', org.id]" class="font-medium text-ink">{{ org.name }}</a>
+              <p class="text-xs text-ink-muted">{{ org.industry || "—" }} · {{ org.country || org.staffRange || org.slug }}</p>
+            </td>
+            <td class="px-3 py-3 text-ink-secondary">{{ org.owner ? org.owner.firstName + " " + org.owner.lastName : "—" }}</td>
+            <td class="px-3 py-3 text-ink-secondary">
+              {{ org.activeStaffCount }}/{{ org.staffCount }}
+              @if (org.overSeatLimit) {
+                <app-badge tone="warning">Over seats</app-badge>
+              }
+            </td>
+            <td class="px-3 py-3 text-ink-secondary">{{ org.documentCount }} · {{ formatBytes(org.storageBytes) }}</td>
+            <td class="px-3 py-3 text-ink-secondary">{{ org.projectCount }}</td>
+            <td class="px-3 py-3">
+              <app-badge [tone]="org.isActive ? 'success' : 'danger'">{{ org.isActive ? "Active" : "Suspended" }}</app-badge>
+            </td>
+            <td class="px-3 py-3 text-right">
+              <app-button variant="secondary" (click)="toggle(org)">{{ org.isActive ? "Suspend" : "Activate" }}</app-button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  @if (meta(); as page) {
+    <div class="mt-4 flex items-center justify-between text-xs text-ink-muted">
+      <span>{{ page.total }} organizations</span>
+      <div class="flex gap-2">
+        <app-button variant="secondary" [disabled]="page.page <= 1" (click)="changePage(page.page - 1)">Previous</app-button>
+        <app-button variant="secondary" [disabled]="page.page >= page.totalPages" (click)="changePage(page.page + 1)">Next</app-button>
+      </div>
+    </div>
+  }
+}

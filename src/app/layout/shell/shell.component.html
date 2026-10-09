@@ -20,7 +20,9 @@
   </div>
 </div>
 
-<app-attendance-reminder-modal />
+@if (!auth.isPlatformAdmin()) {
+  <app-attendance-reminder-modal />
+}
 
 <app-modal
   [open]="forceLogoutModal().open"

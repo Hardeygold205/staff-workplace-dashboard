@@ -1,16 +1,42 @@
-import { Component, inject } from "@angular/core";
+import { Component, OnInit, inject } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { RouterLink, RouterLinkActive } from "@angular/router";
 import { SidebarService } from "../../core/services/sidebar.service";
 import { AuthService } from "../../core/services/auth.service";
 import { ThemeService } from "../../core/services/theme.service";
+import { OrganizationsService } from "../../core/services/organizations.service";
 
 interface NavItem {
   label: string;
   icon: string;
   route: string;
   permission?: string | string[];
+  exact?: boolean;
 }
+
+const PLATFORM_NAV: NavItem[] = [
+  {
+    label: "Overview",
+    route: "/platform",
+    exact: true,
+    icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+  },
+  {
+    label: "Organizations",
+    route: "/platform/organizations",
+    icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+  },
+  {
+    label: "Signups",
+    route: "/platform/signups",
+    icon: "M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z",
+  },
+  {
+    label: "Activity",
+    route: "/platform/activity",
+    icon: "M4 6h16M4 12h16M4 18h7",
+  },
+];
 
 const NAV_ITEMS: NavItem[] = [
   {
@@ -60,6 +86,30 @@ const NAV_ITEMS: NavItem[] = [
     permission: "users:view",
   },
   {
+    label: "Departments",
+    route: "/departments",
+    icon: "M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10",
+    permission: "departments:view",
+  },
+  {
+    label: "Branches",
+    route: "/branches",
+    icon: "M17.657 16.657L13.414 20.9a2 2 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z",
+    permission: "branches:view",
+  },
+  {
+    label: "Invitations",
+    route: "/invitations",
+    icon: "M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z",
+    permission: "invitations:manage",
+  },
+  {
+    label: "Organization",
+    route: "/organization",
+    icon: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+    permission: "roles:manage",
+  },
+  {
     label: "Roles & Permissions",
     route: "/roles",
     icon: "M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z",
@@ -84,11 +134,21 @@ const NAV_ITEMS: NavItem[] = [
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: "./sidebar.component.html",
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit {
   theme = inject(ThemeService);
   sidebar = inject(SidebarService);
   auth = inject(AuthService);
-  items = NAV_ITEMS;
+  organizations = inject(OrganizationsService);
+
+  get items(): NavItem[] {
+    return this.auth.isPlatformAdmin() ? PLATFORM_NAV : NAV_ITEMS;
+  }
+
+  ngOnInit(): void {
+    if (this.auth.isAuthenticated() && !this.auth.isPlatformAdmin()) {
+      this.organizations.mine().subscribe({ error: () => {} });
+    }
+  }
 
   canSee(item: NavItem): boolean {
     if (!item.permission) return true;

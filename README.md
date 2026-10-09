@@ -1,87 +1,175 @@
-# EXAF Workplace Dashboard
+# Staff Workplace
 
-Angular 18 + Tailwind CSS v4 frontend for the EXAF Staff Workplace Platform API.
+Angular app for the multi-tenant staff workplace API. One deployment serves many organizations. After sign-in, the shell, page title, and logo follow the company the person belongs to. The platform admin sees a separate dashboard and does not enter a company's workplace.
 
-## Setup
+The app talks to the API at `/api/v1`. Local default is `http://localhost:5002/api/v1`. The API must allow this app's origin in `CORS_ORIGINS` (local default `http://localhost:4200`).
+
+## Who sees what
+
+| Person                                         | Lands on       | Sidebar                                                                                             |
+| ---------------------------------------------- | -------------- | --------------------------------------------------------------------------------------------------- |
+| Organization owner, admin, executive, or staff | `/dashboard` | Workplace: attendance, projects, people, and the rest of the company tools they are allowed to open |
+| Platform admin                                 | `/platform`  | Overview, organizations, signups, activity                                                          |
+
+A menu item with a permission is hidden when the signed-in user does not have it. Typing the URL still runs `permissionGuard` or `platformAdminGuard`.
+
+The browser title is the organization name. A platform admin sees **Platform**. Before an organization is loaded, the title is **Workplace**.
+
+## How an organization uses it
+
+### Create the company
+
+Open `/register` from the login page (**Create an organization**).
+
+The form collects the company and the first owner. There is no payment step.
+
+- Company: name, optional slug, legal name, industry, website, phone, address, city, state, country, timezone, staff range (`1-10`, `11-50`, `51-200`, `201-500`, `500+`), registration number, and a short about.
+- Owner: first name, last name, email, password.
+
+Submit calls `POST /auth/register-organization`, stores the session, and opens the workplace. That person is the organization owner.
+
+### Set the brand and hours
+
+**Organization** (`/organization`, requires `roles:manage`):
+
+- Upload a logo and a square icon. Until a logo is uploaded, the app uses the default mark in `src/assets`.
+- Save company details.
+- Set work start, work end, auto-checkout, work days, suggestions, and screentime.
+
+### Add departments and offices
+
+**Departments** (`/departments`) creates, edits, and deactivates teams and can assign a department head.
+
+**Branches** (`/branches`) creates offices with address, city, state, and country. These are not a fixed list.
+
+### Choose access
+
+**Roles & Permissions** (`/roles`) lists this company's roles and can create another one, including an executive-style role. Check the permissions that role should have and save.
+
+`organizations:manage` is not shown here. That permission belongs to the platform admin only. The owner role cannot be edited.
+
+### Add people
+
+**Invitations** (`/invitations`) sends an email invite with an optional role and department. Copy the accept link if the person does not receive the mail.
+
+The invited person opens `/accept-invitation` (also linked from the login page). They enter the token, their name, and a password, then land in the workplace.
+
+**Staffs** (`/users`) is the directory. Someone with `users:create` can also create an account directly, reset a password, change permissions, deactivate a person, or mark them exempt from attendance.
+
+Exempt staff do not see check-in or check-out on **Attendance**.
+
+### Day to day
+
+| Screen        | Path               | What it is                                                                                                                                                                                                                    |
+| ------------- | ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard     | `/dashboard`     | Home for a company user                                                                                                                                                                                                       |
+| Attendance    | `/attendance`    | Check in and out, unless the person is exempt. Review tools follow attendance permissions.                                                                                                                                    |
+| Requests      | `/requests`      | Submit a request. Reviewers see the queue.                                                                                                                                                                                    |
+| Projects      | `/projects`      | Sheet of projects.**New project** sets name, description, department, visibility, status, dates, members, and an optional file.                                                                                         |
+| Project tasks | `/projects/:id`  | Sheet of tasks. Status, priority, assignee, and due date edit in the row. Type a title on the last row and press Enter to add one.                                                                                            |
+| Events        | `/events`        | Company events                                                                                                                                                                                                                |
+| Calendar      | `/calendar`      | Month view                                                                                                                                                                                                                    |
+| Suggestions   | `/suggestions`   | Staff suggestions, when the organization has them turned on                                                                                                                                                                   |
+| Uploads       | `/uploads`       | Pick a folder (project, task, request, or person), then pick the record from the list. Do not paste an id. The list below shows files already stored.**View** opens images, PDF, audio, video, and text in the browser. |
+| Screentime    | `/screentime`    | Usage, for people with`attendance:view_all`                                                                                                                                                                                 |
+| Activity log  | `/activities`    | Own activity, or the company log when allowed                                                                                                                                                                                 |
+| Profile       | `/profile`       | Own name, avatar, and password                                                                                                                                                                                                |
+| Notifications | `/notifications` | Inbox                                                                                                                                                                                                                         |
+
+Project visibility:
+
+- **Public** — anyone in the organization
+- **Department only** — that department
+- **Private** — the creator and people invited onto the project, including someone from another department
+
+Member roles on a project are manager, member, and viewer. The creator is the owner.
+
+## Platform admin
+
+Sign in with the seeded platform account. The app sends them to `/platform` instead of the company dashboard.
+
+| Screen           | Path                            |
+| ---------------- | ------------------------------- |
+| Overview         | `/platform`                   |
+| Organizations    | `/platform/organizations`     |
+| One organization | `/platform/organizations/:id` |
+| Signups          | `/platform/signups`           |
+| Activity         | `/platform/activity`          |
+
+This view is for counts and account status: companies, staff size, storage size, new signups, and activity. It does not open a company's documents or run that company's workplace. Suspending a company uses the organization status endpoint.
+
+## For developers
+
+Standalone Angular components, `inject()`, and signals. Routes are lazy-loaded from `src/app/app.routes.ts`. The signed-in chrome is `src/app/layout` (shell, sidebar, top bar).
+
+### Run
+
+The API should already be up on port `5002`.
 
 ```bash
 pnpm install
-```
-
-Update `src/environments/environment.ts` if your backend isn't on `http://localhost:5002/api/v1`.
-
-Replace the placeholder assets with the real ones:
-- `src/assets/logo-full.svg` — full wordmark, shown when the sidebar is expanded
-- `src/assets/logo-icon.svg` — icon-only mark, shown when the sidebar is collapsed
-- `src/assets/favicon.ico` — currently an empty placeholder
-
-```bash
 pnpm start
 ```
 
-App runs at `http://localhost:4200`.
+Dev server: `http://localhost:4200`.
 
-## What's built
+Point the app at another API in `src/environments/environment.ts`:
 
-Every endpoint you listed has a corresponding page:
+```ts
+apiUrl: "http://localhost:5002/api/v1",
+wsUrl: "http://localhost:5002",
+```
 
-| Area | Route | Notes |
-|---|---|---|
-| Auth | `/login` | No self-registration, matches the backend |
-| Dashboard | `/dashboard` | Today's attendance, pending requests, upcoming events |
-| Attendance | `/attendance` | Check-in/out, checkout-reason picker, admin review queue |
-| Requests | `/requests` | Dynamic categories, To:/Cc: email autocomplete, admin approve/reject |
-| Projects | `/projects`, `/projects/:id` | Kanban-style task board |
-| Directory | `/users` | Admin create/deactivate/reset-password, permission overrides |
-| Roles | `/roles` | Create roles, permission matrix editor |
-| Notifications | `/notifications` | List, mark read/all-read |
-| Uploads | `/uploads` | Drag-drop, folder/entity tagging, download, delete |
-| Events | `/events` | Create with optional company-wide email broadcast |
-| Calendar | `/calendar` | Month grid + upcoming list |
-| Suggestions | `/suggestions` | Vote, admin status changes |
-| Screentime | `/screentime` | Self summary + admin team view |
-| Activity Log | `/activities` | Self or all-staff, depending on permission |
-| Profile | `/profile` | Self-service completion (username/DOB/bio/avatar), change password |
+`environment.prod.ts` is the production API. Change that host before building a production bundle. `ng build` replaces the environment file for the production configuration.
 
-## The 9am/5pm reminder — how it actually works
+### Sign-in and HTTP
 
-`core/services/attendance-reminder.service.ts` polls `GET /attendance/me` every 60 seconds
-while logged in, computes the current hour in WAT (`Africa/Lagos`, fixed UTC+1 — matches
-your backend's `wat.util.ts`) via `Intl.DateTimeFormat`, and shows a **non-dismissible**
-modal (`layout/attendance-reminder-modal/`) when:
-- It's ≥9:00am WAT and there's no check-in for today, or
-- It's ≥5:00pm WAT and there's a check-in but no check-out.
+`AuthService` stores the access and refresh tokens in `localStorage` (`ACCESS_TOKEN_KEY`, `REFRESH_TOKEN_KEY` in the environment file). The auth interceptor attaches `Authorization: Bearer …` and refreshes on `401`.
 
-"Remind me in 15 min" snoozes rather than permanently dismissing — it reappears if the
-condition is still true. The modal calls the real check-in/check-out endpoints directly;
-if a checkout needs a reason (outside the 5–6pm grace window) and the API rejects it, the
-modal tells the user to finish on the full Attendance page rather than duplicating the
-reason picker inline.
+The API wraps payloads as `{ success, statusCode, message, data }`. `unwrapResponseInterceptor` strips that envelope, so services type the `data` value only. Download and preview calls that are not JSON are left alone.
 
-## RBAC on the frontend
+Guards:
 
-`AuthService` decodes the JWT payload (never verifies it — that's the backend's job) to
-read `roles`/`permissions` for **UI gating only**: hiding nav items, buttons, and whole
-routes (`permissionGuard`) that a user can't act on anyway. The backend remains the real
-authorization boundary — every one of these checks has a matching `@RequirePermissions()`
-guard server-side.
+| Guard                  | Use                                                                  |
+| ---------------------- | -------------------------------------------------------------------- |
+| `authGuard`          | Must be signed in                                                    |
+| `guestGuard`         | Login, register, and accept-invitation. Sends a signed-in user away. |
+| `permissionGuard`    | Route`data.permission` must be on the token                        |
+| `platformAdminGuard` | `isPlatformAdmin` only                                             |
+| `homeRedirectGuard`  | `/` goes to `/platform` or `/dashboard`                        |
 
-## Known gaps / best-effort areas
+`HasPermission` directive and `AuthService.hasPermission()` hide buttons the same way the sidebar hides links. Hiding a control is not security. The API still checks the permission.
 
-A few models were built from the endpoint list and partial schema visibility rather than
-a fully confirmed response shape — check these against the real API responses once wired up:
-- `CompanyEvent.type` — kept as `string`, not a strict union; tighten once you confirm the
-  full enum in `event.prisma`.
-- `MonthlyCalendar` shape (`calendar.model.ts`) — adjust field names if `/calendar/monthly`
-  returns something different.
-- `Suggestion.status` values — confirm against `suggestion.prisma`.
+### Where to change things
 
-## Theming
+| Path                                                      | Purpose                                                            |
+| --------------------------------------------------------- | ------------------------------------------------------------------ |
+| `src/app/app.routes.ts`                                 | Screens and guards                                                 |
+| `src/app/layout/sidebar/sidebar.component.ts`           | `NAV_ITEMS` and `PLATFORM_NAV`                                 |
+| `src/app/core/services`                                 | One service per API area                                           |
+| `src/app/core/models`                                   | Response types                                                     |
+| `src/app/features`                                      | Screens. Each feature is a standalone component plus its template. |
+| `src/app/shared/ui`                                     | Page header, card, button, modal, badge, empty state, spinner      |
+| `src/app/core/services/document-title.service.ts`       | Browser title                                                      |
+| `src/styles.css`                                        | Theme tokens: ink, paper, brand green, surfaces                    |
+| `src/assets/logo.svg`, `logo-light.svg`, `mark.svg` | Default mark used until an organization uploads its own            |
 
-Dark/light mode uses Tailwind v4's `@custom-variant dark` with class-based toggling
-(`ThemeService` flips `.dark` on `<html>`, persisted to `localStorage`). Brand colors are
-in `src/styles.css`'s `@theme` block — utilities are `bg-brand-green`, `text-brand-cream`,
-etc. Everything else (`bg-surface`, `text-ink`, `border-line`, `bg-accent`) is a semantic
-token that automatically flips between light and dark — components never check which mode
-is active.
-# exaf-workplace-dashboard
+A new screen is a folder under `features`, a `loadComponent` route, and a `NAV_ITEMS` entry. If only some roles should see it, set `permission` on the nav item and the same key on the route's `data`.
+
+### Uploads
+
+`GET /uploads` returns `{ items, meta }`, not a bare array. `UploadsService.list()` normalizes both shapes. The library lists files for the organization (or the current user when they lack `uploads:view_all`). The folder dropdown only chooses where the next upload is attached.
+
+`REQUEST` in the form is sent as the API entity type `STAFF_REQUEST`. Project and task uploads use `PROJECT` and `TASK`. Viewing a private bucket file uses `GET /uploads/:id/preview`, then shows the URL in the viewer. Word and Excel files stay on **Download**.
+
+### Realtime
+
+`wsUrl` is the API origin for Socket.IO. The client uses it to hear permission changes and other workplace events. If the socket is down, REST still works. The user may need to sign in again before a new role appears on the token.
+
+### Production build
+
+```bash
+pnpm run build
+```
+
+Serve the `dist` output behind the host named in `environment.prod.ts`, and set the API `CORS_ORIGINS` to that host. The default logo is only a fallback. Each organization supplies its own logo and icon after registration.

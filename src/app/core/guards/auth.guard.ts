@@ -14,6 +14,6 @@ export const guestGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
   const router = inject(Router);
   if (!auth.isAuthenticated()) return true;
-  router.navigate(['/dashboard']);
+  router.navigate([auth.isPlatformAdmin() ? '/platform' : '/dashboard']);
   return false;
 };

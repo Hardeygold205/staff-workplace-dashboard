@@ -1,4 +1,8 @@
-export type OfficeBranch = "ABUJA" | "KANO";
+export interface NamedRef {
+  id: string;
+  name: string;
+}
+
 export type Shift = "ONSITE" | "HYBRID" | "REMOTE";
 
 export interface RoleRef {
@@ -12,9 +16,11 @@ export interface User {
   lastName: string;
   middleName?: string | null;
   username?: string | null;
-  department: string;
+  department?: string | NamedRef | null;
+  departmentId?: string | null;
   position: string;
-  officeBranch: OfficeBranch;
+  officeBranch?: string | NamedRef | null;
+  officeBranchId?: string | null;
   shift: Shift;
   isIntern: boolean;
   bio?: string | null;
@@ -27,6 +33,11 @@ export interface User {
   roles: RoleRef[];
   permissionGrants: string[] | null;
   permissionRevokes: string[] | null;
+}
+
+export function placeName(value: string | NamedRef | null | undefined): string {
+  if (!value) return "";
+  return typeof value === "string" ? value : value.name;
 }
 
 export function roleNames(user: Pick<User, "roles">): string[] {
@@ -50,9 +61,9 @@ export interface CreateUserPayload {
   roleNames: string[];
   middleName?: string;
   username?: string;
-  department?: string;
+  departmentId?: string;
   position?: string;
-  officeBranch?: OfficeBranch;
+  officeBranchId?: string;
   shift?: Shift;
   isIntern?: boolean;
 }
@@ -68,9 +79,9 @@ export interface AdminUpdateUserPayload {
   firstName?: string;
   lastName?: string;
   roleNames?: string[];
-  department?: string;
+  departmentId?: string | null;
   position?: string;
-  officeBranch?: OfficeBranch;
+  officeBranchId?: string | null;
   shift?: Shift;
   isIntern?: boolean;
   avatarUrl?: string | null;

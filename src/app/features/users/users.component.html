@@ -52,8 +52,9 @@
         (change)="branchFilter.set($any($event.target).value)"
         class="rounded-lg border border-line bg-surface px-2.5 py-1.5 text-xs text-ink">
         <option value="ALL">All Branches</option>
-        <option value="ABUJA">Abuja</option>
-        <option value="KANO">Kano</option>
+        @for (branch of branches(); track branch.id) {
+          <option [value]="branch.id">{{ branch.name }}</option>
+        }
       </select>
 
       <select
@@ -119,13 +120,13 @@
                 </div>
               </td>
               <td class="py-3 pr-4 text-ink-secondary">
-                <p class="font-medium text-ink">{{ user.department || "—" }}</p>
+                <p class="font-medium text-ink">{{ placeName(user.department) || "—" }}</p>
                 <p class="text-[11px] text-ink-muted">
                   {{ user.position || "—" }}
                 </p>
               </td>
               <td class="py-3 pr-4 text-ink-secondary">
-                <p class="font-medium">{{ user.officeBranch }}</p>
+                <p class="font-medium">{{ placeName(user.officeBranch) || "—" }}</p>
                 <span
                   class="text-[10px] text-ink-muted uppercase tracking-wider"
                   >{{ user.shift }}</span
@@ -138,14 +139,19 @@
               </td>
               <td class="py-3 pr-4 text-right">
                 <div class="flex items-center justify-end gap-2">
-                  <!-- @if (auth.hasPermission("attendance:manage_exemption")) {
+                  @if (auth.hasPermission("attendance:manage_exemption")) {
                     <button
                       type="button"
+                      [disabled]="exemptionLoading.has(user.id)"
                       (click)="toggleExemption(user)"
-                      class="text-ink-secondary hover:text-ink font-medium hover:underline">
-                      {{ user.attendanceExempt ? "Un-exempt" : "Exempt" }}
+                      class="text-ink-secondary hover:text-ink font-medium hover:underline disabled:opacity-50">
+                      @if (exemptionLoading.has(user.id)) {
+                        Updating...
+                      } @else {
+                        {{ user.attendanceExempt ? "Un-exempt" : "Exempt" }}
+                      }
                     </button>
-                  } -->
+                  }
                   @if (auth.hasPermission("users:manage_permissions")) {
                     <button
                       type="button"
@@ -210,7 +216,7 @@
       >
       <input
         formControlName="email"
-        placeholder="a.user@extensionafrica.com"
+        placeholder="you@company.com"
         class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
     </div>
     <div class="grid grid-cols-2 gap-3">
@@ -218,9 +224,14 @@
         <label class="mb-1 block text-xs font-medium text-ink-secondary"
           >Department</label
         >
-        <input
-          formControlName="department"
-          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+        <select
+          formControlName="departmentId"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+          <option value="">No department</option>
+          @for (department of departments(); track department.id) {
+            <option [value]="department.id">{{ department.name }}</option>
+          }
+        </select>
       </div>
       <div>
         <label class="mb-1 block text-xs font-medium text-ink-secondary"
@@ -237,10 +248,12 @@
           >Office Branch</label
         >
         <select
-          formControlName="officeBranch"
+          formControlName="officeBranchId"
           class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
-          <option value="ABUJA">Abuja</option>
-          <option value="KANO">Kano</option>
+          <option value="">No branch</option>
+          @for (branch of branches(); track branch.id) {
+            <option [value]="branch.id">{{ branch.name }}</option>
+          }
         </select>
       </div>
       <div>

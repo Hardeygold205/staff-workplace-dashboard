@@ -20,14 +20,14 @@
             d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <p class="text-sm">
-          You're marked present by default and don't need to check in or out
-          daily. You can still check in voluntarily below if you'd like to track
-          your own time.
+          You're exempt from attendance. Check-in and check-out are turned off for this account.
         </p>
       </div>
     }
     @if (loading()) {
       <app-spinner />
+    } @else if (isExempt()) {
+      <p class="text-sm text-ink-secondary">No daily check-in is required.</p>
     } @else {
       @if (error()) {
         <p

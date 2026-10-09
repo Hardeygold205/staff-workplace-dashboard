@@ -1,7 +1,30 @@
-export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'IN_REVIEW' | 'DONE';
-export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH';
+export type TaskStatus =
+  | "TODO"
+  | "IN_PROGRESS"
+  | "IN_REVIEW"
+  | "DONE"
+  | "BLOCKED";
+export type TaskPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
 
-export const TASK_STATUS_COLUMNS: TaskStatus[] = ['TODO', 'IN_PROGRESS', 'IN_REVIEW', 'DONE'];
+export const TASK_STATUSES: TaskStatus[] = [
+  "TODO",
+  "IN_PROGRESS",
+  "IN_REVIEW",
+  "DONE",
+  "BLOCKED",
+];
+export const TASK_PRIORITIES: TaskPriority[] = [
+  "LOW",
+  "MEDIUM",
+  "HIGH",
+  "URGENT",
+];
+
+export interface TaskPerson {
+  id: string;
+  firstName: string;
+  lastName: string;
+}
 
 export interface Task {
   id: string;
@@ -10,25 +33,25 @@ export interface Task {
   description?: string | null;
   status: TaskStatus;
   priority: TaskPriority;
-  assignedToId?: string | null;
+  assigneeId?: string | null;
   dueDate?: string | null;
   createdAt: string;
   updatedAt: string;
-  assignedTo?: { id: string; firstName: string; lastName: string } | null;
+  assignee?: TaskPerson | null;
 }
 
 export interface CreateTaskPayload {
   title: string;
   description?: string;
   priority?: TaskPriority;
-  assignedToId?: string;
-  dueDate?: string;
+  assigneeId?: string | null;
+  dueDate?: string | null;
 }
 
 export interface UpdateTaskPayload {
   title?: string;
-  description?: string;
+  description?: string | null;
   priority?: TaskPriority;
-  assignedToId?: string | null;
+  assigneeId?: string | null;
   dueDate?: string | null;
 }

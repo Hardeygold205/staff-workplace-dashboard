@@ -28,19 +28,22 @@
           } @else {
             <div [class]="cellClasses(cell)" class="group">
               <!-- Always-visible Day Number & Attendance Status -->
-              <div class="flex items-center justify-between">
+              <div class="flex items-center">
                 <p
-                  class="text-xs font-semibold"
+                  class="text-xs font-semibold absolute top-0.5 left-0.5"
                   [class.text-ink-muted]="cell.isWeekend"
                   [class.text-ink]="!cell.isWeekend">
                   {{ cell.day }}
                 </p>
 
                 @if (!cell.isWeekend && statusLabel(cell.status)) {
-                  <span
-                    class="text-[9px] font-medium uppercase tracking-wider text-ink-secondary">
-                    {{ statusLabel(cell.status) }}
-                  </span>
+                  <div
+                    class="flex justify-center items-center text-center mx-auto flex-1 w-full">
+                    <span
+                      class="text-[9px] font-medium uppercase tracking-wider text-ink-secondary text-center">
+                      {{ statusLabel(cell.status) }}
+                    </span>
+                  </div>
                 }
               </div>
 

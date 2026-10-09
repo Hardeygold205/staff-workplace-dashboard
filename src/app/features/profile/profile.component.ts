@@ -17,7 +17,7 @@ import { UsersService } from "../../core/services/users.service";
 import { AttendanceService } from "../../core/services/attendance.service";
 import { AttendanceReminderService } from "../../core/services/attendance-reminder.service";
 import { AuthService } from "../../core/services/auth.service";
-import { User, displayName, roleNames } from "../../core/models/user.model";
+import { User, displayName, placeName, roleNames } from "../../core/models/user.model";
 import {
   AttendanceRecord,
   CheckoutReasonOption,
@@ -81,7 +81,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   passwordError = signal<string | null>(null);
   passwordSaved = signal(false);
 
+  isExempt = computed(() => this.me()?.attendanceExempt === true);
   displayName = displayName;
+  placeName = placeName;
   roleNames = roleNames;
 
   profileForm = this.fb.nonNullable.group({

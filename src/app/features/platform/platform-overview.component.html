@@ -1,0 +1,96 @@
+<app-page-header
+  title="Platform"
+  subtitle="Every organization on this workplace, without opening their files." />
+
+@if (loading()) {
+  <app-spinner />
+} @else if (error()) {
+  <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ error() }}</p>
+} @else {
+  @if (overview(); as data) {
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <app-card class="block">
+        <p class="text-xs uppercase tracking-wide text-ink-muted">Organizations</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">{{ data.organizations.total }}</p>
+        <p class="text-xs text-ink-secondary">{{ data.organizations.active }} active · {{ data.organizations.suspended }} suspended</p>
+      </app-card>
+      <app-card class="block">
+        <p class="text-xs uppercase tracking-wide text-ink-muted">New accounts</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">{{ data.organizations.signupsLast7Days }}</p>
+        <p class="text-xs text-ink-secondary">{{ data.organizations.signupsLast30Days }} in the last 30 days</p>
+      </app-card>
+      <app-card class="block">
+        <p class="text-xs uppercase tracking-wide text-ink-muted">Staff</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">{{ data.staff.total }}</p>
+        <p class="text-xs text-ink-secondary">{{ data.staff.active }} active</p>
+      </app-card>
+      <app-card class="block">
+        <p class="text-xs uppercase tracking-wide text-ink-muted">Documents</p>
+        <p class="mt-1 text-2xl font-semibold text-ink">{{ data.documents.count }}</p>
+        <p class="text-xs text-ink-secondary">{{ formatBytes(data.documents.sizeBytes) }} stored</p>
+      </app-card>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <app-card title="Signups, last 30 days" class="block lg:col-span-2">
+        <div class="flex h-40 items-end gap-1">
+          @for (point of data.signupsByDay; track point.day) {
+            <div class="group flex flex-1 flex-col items-center justify-end" [title]="point.day + ': ' + point.count">
+              <div
+                class="w-full min-h-1 rounded-sm bg-brand-green"
+                [style.height.px]="Math.max(4, (point.count / maxSignup()) * 140)"></div>
+            </div>
+          }
+        </div>
+        <p class="mt-3 text-xs text-ink-muted">Organization accounts only. Bar height is the daily count.</p>
+      </app-card>
+
+      <app-card title="Storage by type" class="block">
+        @if (data.documents.byType.length === 0) {
+          <p class="text-sm text-ink-secondary">No documents yet.</p>
+        } @else {
+          <div class="space-y-2">
+            @for (bucket of data.documents.byType; track bucket.type) {
+              <div class="flex items-center justify-between text-sm">
+                <span class="capitalize text-ink">{{ bucket.type }}</span>
+                <span class="text-ink-secondary">{{ bucket.count }} · {{ formatBytes(bucket.sizeBytes) }}</span>
+              </div>
+            }
+          </div>
+        }
+        <p class="mt-4 text-xs text-ink-muted">{{ data.projects }} projects · {{ data.tasks }} tasks · {{ data.pendingInvitations }} pending invites</p>
+      </app-card>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <app-card title="Newest organizations" class="block">
+        <div class="space-y-2">
+          @for (org of recent(); track org.id) {
+            <a [routerLink]="['/platform/organizations', org.id]" class="flex items-center justify-between gap-3 rounded-lg px-1 py-1 hover:bg-surface-muted">
+              <div>
+                <p class="text-sm font-medium text-ink">{{ org.name }}</p>
+                <p class="text-xs text-ink-muted">{{ org.owner?.email || org.slug }} · {{ org.staffCount }} staff</p>
+              </div>
+              <app-badge [tone]="org.isActive ? 'success' : 'danger'">{{ org.isActive ? 'Active' : 'Suspended' }}</app-badge>
+            </a>
+          }
+        </div>
+        <a routerLink="/platform/signups" class="mt-4 inline-block text-xs font-medium text-brand-green">All signups</a>
+      </app-card>
+
+      <app-card title="Recent activity" class="block">
+        <div class="space-y-3">
+          @for (item of activity(); track item.id) {
+            <div>
+              <p class="text-sm text-ink">{{ item.description }}</p>
+              <p class="text-xs text-ink-muted">
+                {{ item.organization?.name || 'Platform' }} · {{ item.createdAt | date: 'MMM d, HH:mm' }}
+              </p>
+            </div>
+          }
+        </div>
+        <a routerLink="/platform/activity" class="mt-4 inline-block text-xs font-medium text-brand-green">Full activity</a>
+      </app-card>
+    </div>
+  }
+}

@@ -239,7 +239,7 @@ export class CalendarComponent implements OnInit {
       HALF_DAY: "Half Day",
       LEAVE: "Leave",
       ABSENT: "Absent",
-      EXEMPT: "Exempt",
+      EXEMPT: "Present (By default)",
     };
     return labels[status] ?? null;
   }

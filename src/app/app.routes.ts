@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard, guestGuard } from './core/guards/auth.guard';
 import { permissionGuard } from './core/guards/permission.guard';
+import { homeRedirectGuard, platformAdminGuard } from './core/guards/platform-admin.guard';
 import { ShellComponent } from './layout/shell/shell.component';
 
 export const routes: Routes = [
@@ -10,11 +11,59 @@ export const routes: Routes = [
     loadComponent: () => import('./features/auth/login/login.component').then((m) => m.LoginComponent),
   },
   {
+    path: 'register',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/register/register-organization.component').then(
+        (m) => m.RegisterOrganizationComponent,
+      ),
+  },
+  {
+    path: 'accept-invitation',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/accept-invitation/accept-invitation.component').then(
+        (m) => m.AcceptInvitationComponent,
+      ),
+  },
+  {
     path: '',
     component: ShellComponent,
     canActivate: [authGuard],
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+      { path: '', pathMatch: 'full', canActivate: [homeRedirectGuard], children: [] },
+      {
+        path: 'platform',
+        canActivate: [platformAdminGuard],
+        loadComponent: () =>
+          import('./features/platform/platform-overview.component').then((m) => m.PlatformOverviewComponent),
+      },
+      {
+        path: 'platform/organizations',
+        canActivate: [platformAdminGuard],
+        loadComponent: () =>
+          import('./features/platform/platform-organizations.component').then((m) => m.PlatformOrganizationsComponent),
+      },
+      {
+        path: 'platform/organizations/:id',
+        canActivate: [platformAdminGuard],
+        loadComponent: () =>
+          import('./features/platform/platform-organization-detail.component').then(
+            (m) => m.PlatformOrganizationDetailComponent,
+          ),
+      },
+      {
+        path: 'platform/signups',
+        canActivate: [platformAdminGuard],
+        loadComponent: () =>
+          import('./features/platform/platform-signups.component').then((m) => m.PlatformSignupsComponent),
+      },
+      {
+        path: 'platform/activity',
+        canActivate: [platformAdminGuard],
+        loadComponent: () =>
+          import('./features/platform/platform-activity.component').then((m) => m.PlatformActivityComponent),
+      },
       {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
@@ -47,6 +96,33 @@ export const routes: Routes = [
         canActivate: [permissionGuard],
         data: { permission: 'roles:view' },
         loadComponent: () => import('./features/roles/roles.component').then((m) => m.RolesComponent),
+      },
+      {
+        path: 'departments',
+        canActivate: [permissionGuard],
+        data: { permission: 'departments:view' },
+        loadComponent: () =>
+          import('./features/departments/departments.component').then((m) => m.DepartmentsComponent),
+      },
+      {
+        path: 'branches',
+        canActivate: [permissionGuard],
+        data: { permission: 'branches:view' },
+        loadComponent: () => import('./features/branches/branches.component').then((m) => m.BranchesComponent),
+      },
+      {
+        path: 'invitations',
+        canActivate: [permissionGuard],
+        data: { permission: 'invitations:manage' },
+        loadComponent: () =>
+          import('./features/invitations/invitations.component').then((m) => m.InvitationsComponent),
+      },
+      {
+        path: 'organization',
+        canActivate: [permissionGuard],
+        data: { permission: 'roles:manage' },
+        loadComponent: () =>
+          import('./features/organization/organization.component').then((m) => m.OrganizationComponent),
       },
       {
         path: 'notifications',
@@ -84,5 +160,5 @@ export const routes: Routes = [
       },
     ],
   },
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '**', canActivate: [homeRedirectGuard], children: [] },
 ];

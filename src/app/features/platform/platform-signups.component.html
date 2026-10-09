@@ -1,0 +1,25 @@
+<app-page-header title="New organizations" subtitle="Accounts created on the platform. Staff signups inside a company are not listed here." />
+
+<div class="mb-4 flex gap-2">
+  @for (option of [7, 30, 90]; track option) {
+    <app-button [variant]="days() === option ? 'primary' : 'secondary'" (click)="setDays(option)">{{ option }} days</app-button>
+  }
+</div>
+
+@if (loading()) {
+  <app-spinner />
+} @else {
+  <div class="space-y-3">
+    @for (org of items(); track org.id) {
+      <a [routerLink]="['/platform/organizations', org.id]" class="block rounded-xl border border-line px-4 py-3 hover:bg-surface-muted">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-sm font-medium text-ink">{{ org.name }}</p>
+            <p class="text-xs text-ink-muted">{{ org.owner?.email || "No owner email" }} · {{ org.createdAt | date: "MMM d, y" }}</p>
+          </div>
+          <app-badge [tone]="org.isActive ? 'success' : 'danger'">{{ org.staffCount }} staff</app-badge>
+        </div>
+      </a>
+    }
+  </div>
+}

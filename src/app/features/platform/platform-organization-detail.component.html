@@ -1,0 +1,61 @@
+<a routerLink="/platform/organizations" class="mb-3 inline-block text-xs font-medium text-brand-green">Back to organizations</a>
+
+@if (loading()) {
+  <app-spinner />
+} @else {
+  @if (org(); as org) {
+    <app-page-header [title]="org.name" [subtitle]="org.legalName || org.slug">
+      <app-button variant="secondary" (click)="toggle()">{{ org.isActive ? "Suspend" : "Activate" }}</app-button>
+    </app-page-header>
+
+    <div class="mb-6 flex flex-wrap gap-2">
+      <app-badge [tone]="org.isActive ? 'success' : 'danger'">{{ org.isActive ? "Active" : "Suspended" }}</app-badge>
+      <app-badge tone="neutral">{{ org.plan }} · {{ org.seatLimit }} seats</app-badge>
+      @if (org.overSeatLimit) {
+        <app-badge tone="warning">Over seat limit</app-badge>
+      }
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <app-card class="block"><p class="text-xs text-ink-muted">Staff</p><p class="text-xl font-semibold">{{ org.staffCount }}</p><p class="text-xs text-ink-secondary">{{ org.activeStaffCount }} active</p></app-card>
+      <app-card class="block"><p class="text-xs text-ink-muted">Documents</p><p class="text-xl font-semibold">{{ org.documentCount }}</p><p class="text-xs text-ink-secondary">{{ formatBytes(org.storageBytes) }}</p></app-card>
+      <app-card class="block"><p class="text-xs text-ink-muted">Projects</p><p class="text-xl font-semibold">{{ org.projectCount }}</p><p class="text-xs text-ink-secondary">{{ org.departmentCount }} departments</p></app-card>
+      <app-card class="block"><p class="text-xs text-ink-muted">Invites</p><p class="text-xl font-semibold">{{ org.pendingInvitationCount }}</p><p class="text-xs text-ink-secondary">pending of {{ org.invitationCount }}</p></app-card>
+    </div>
+
+    <div class="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <app-card title="Company" class="block">
+        <dl class="grid grid-cols-2 gap-3 text-sm">
+          <div><dt class="text-xs text-ink-muted">Owner</dt><dd>{{ org.owner ? org.owner.firstName + " " + org.owner.lastName : "—" }}</dd></div>
+          <div><dt class="text-xs text-ink-muted">Email</dt><dd>{{ org.owner?.email || "—" }}</dd></div>
+          <div><dt class="text-xs text-ink-muted">Industry</dt><dd>{{ org.industry || "—" }}</dd></div>
+          <div><dt class="text-xs text-ink-muted">Staff range</dt><dd>{{ org.staffRange || "—" }}</dd></div>
+          <div><dt class="text-xs text-ink-muted">Location</dt><dd>{{ org.city || "—" }} {{ org.state || "" }} {{ org.country || "" }}</dd></div>
+          <div><dt class="text-xs text-ink-muted">Created</dt><dd>{{ org.createdAt | date: "MMM d, y" }}</dd></div>
+        </dl>
+      </app-card>
+      <app-card title="Storage by type" class="block">
+        @for (bucket of org.documentsByType ?? []; track bucket.type) {
+          <div class="mb-2 flex justify-between text-sm">
+            <span class="capitalize">{{ bucket.type }}</span>
+            <span class="text-ink-secondary">{{ bucket.count }} · {{ formatBytes(bucket.sizeBytes) }}</span>
+          </div>
+        }
+        <p class="mt-3 text-xs text-ink-muted">Counts and size only. Document names are not loaded here.</p>
+      </app-card>
+    </div>
+
+    <app-card title="Activity, last 30 days" class="mt-6 block">
+      <div class="mb-4 flex flex-wrap gap-2">
+        @for (row of org.activityLast30Days ?? []; track row.action) {
+          <app-badge tone="neutral">{{ row.action }} · {{ row.count }}</app-badge>
+        }
+      </div>
+      <div class="space-y-2">
+        @for (item of activity(); track item.id) {
+          <p class="text-sm text-ink">{{ item.description }} <span class="text-xs text-ink-muted">{{ item.createdAt | date: "MMM d, HH:mm" }}</span></p>
+        }
+      </div>
+    </app-card>
+  }
+}

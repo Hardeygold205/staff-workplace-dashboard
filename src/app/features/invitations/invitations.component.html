@@ -1,0 +1,82 @@
+<app-page-header title="Invitations" subtitle="Invite someone into this organization. They set their own password from the accept link.">
+  <app-button (click)="startCreate()">Invite person</app-button>
+</app-page-header>
+
+@if (notice()) {
+  <p class="mb-4 rounded-lg bg-brand-cream px-3 py-2 text-sm text-brand-green">{{ notice() }}</p>
+}
+
+@if (loading()) {
+  <app-spinner />
+} @else if (invitations().length === 0) {
+  <app-card class="block">
+    <app-empty-state title="No invitations yet" subtitle="Send an email invite instead of creating every staff password yourself." />
+  </app-card>
+} @else {
+  <div class="overflow-x-auto rounded-xl border border-line">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-surface-muted text-xs text-ink-muted">
+        <tr>
+          <th class="px-3 py-2 font-medium">Email</th>
+          <th class="px-3 py-2 font-medium">Role</th>
+          <th class="px-3 py-2 font-medium">Department</th>
+          <th class="px-3 py-2 font-medium">Status</th>
+          <th class="px-3 py-2 font-medium">Expires</th>
+          <th class="px-3 py-2"></th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line">
+        @for (invitation of invitations(); track invitation.id) {
+          <tr>
+            <td class="px-3 py-3 font-medium text-ink">{{ invitation.email }}</td>
+            <td class="px-3 py-3 text-ink-secondary">{{ invitation.role?.name || "—" }}</td>
+            <td class="px-3 py-3 text-ink-secondary">{{ invitation.department?.name || "—" }}</td>
+            <td class="px-3 py-3"><app-badge [tone]="tone(invitation.status)">{{ invitation.status }}</app-badge></td>
+            <td class="px-3 py-3 text-ink-secondary">{{ invitation.expiresAt | date: "MMM d, y" }}</td>
+            <td class="px-3 py-3 text-right">
+              @if (invitation.status === "PENDING") {
+                <div class="flex justify-end gap-2">
+                  @if (invitation.token) {
+                    <app-button variant="secondary" (click)="copyLink(invitation)">Copy link</app-button>
+                  }
+                  <app-button variant="ghost" (click)="cancel(invitation)">Cancel</app-button>
+                </div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+}
+
+<app-modal [open]="open()" title="Invite into this organization" (close)="open.set(false)">
+  <form [formGroup]="form" (ngSubmit)="save()" class="space-y-3">
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Work email</label>
+      <input type="email" formControlName="email" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Role</label>
+      <select formControlName="roleId" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+        <option value="">Choose later</option>
+        @for (role of roles(); track role.id) {
+          <option [value]="role.id">{{ role.name }}</option>
+        }
+      </select>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Department</label>
+      <select formControlName="departmentId" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+        <option value="">No department</option>
+        @for (department of departments(); track department.id) {
+          <option [value]="department.id">{{ department.name }}</option>
+        }
+      </select>
+    </div>
+    @if (error()) {
+      <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+    }
+    <app-button type="submit" [fullWidth]="true" [loading]="saving()">Send invitation</app-button>
+  </form>
+</app-modal>

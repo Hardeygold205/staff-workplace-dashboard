@@ -4,21 +4,23 @@
   [class.w-[76px]]="sidebar.collapsed()">
   <div class="flex h-16 items-center gap-2 border-b border-line px-4">
     @if (!sidebar.collapsed()) {
-      @if (theme.theme() === "dark") {
+      @if (organizations.current()?.logoUrl) {
+        <img [src]="organizations.current()!.logoUrl!" [alt]="organizations.current()!.name" class="h-10 w-auto" />
+      } @else if (theme.theme() === "dark") {
         <img
-          src="assets/logo-white.png"
-          alt="Extension Africa"
+          src="assets/logo-light.svg"
+          alt="Workplace"
           class="h-10 w-auto" />
       } @else {
         <img
-          src="assets/logo-black.png"
-          alt="Extension Africa"
+          src="assets/logo.svg"
+          alt="Workplace"
           class="h-10 w-auto" />
       }
     } @else {
       <img
-        src="assets/logo-icon.png"
-        alt="Extension Africa"
+        [src]="organizations.current()?.iconUrl || 'assets/mark.svg'"
+        [alt]="organizations.current()?.name || 'Workplace'"
         class="mx-auto h-8 w-8" />
     }
   </div>
@@ -29,7 +31,7 @@
         <a
           [routerLink]="item.route"
           routerLinkActive="bg-brand-green text-white"
-          [routerLinkActiveOptions]="{ exact: false }"
+          [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
           class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-secondary transition hover:bg-surface-muted"
           [class.justify-center]="sidebar.collapsed()"
           [title]="sidebar.collapsed() ? item.label : ''">

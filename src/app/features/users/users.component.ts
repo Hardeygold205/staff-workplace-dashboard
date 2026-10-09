@@ -8,8 +8,11 @@ import {
   User,
   displayName,
   initials,
+  placeName,
   roleNames,
 } from "../../core/models/user.model";
+import { DepartmentsService } from "../../core/services/departments.service";
+import { BranchesService, OfficeBranch } from "../../core/services/branches.service";
 import { Permission, Role } from "../../core/models/role.model";
 import { PageHeaderComponent } from "../../shared/ui/page-header/page-header.component";
 import { CardComponent } from "../../shared/ui/card/card.component";
@@ -38,6 +41,8 @@ import { SpinnerComponent } from "../../shared/ui/spinner/spinner.component";
 export class UsersComponent implements OnInit {
   private usersService = inject(UsersService);
   private rolesService = inject(RolesService);
+  private departmentsService = inject(DepartmentsService);
+  private branchesService = inject(BranchesService);
   private fb = inject(FormBuilder);
   auth = inject(AuthService);
 
@@ -48,6 +53,8 @@ export class UsersComponent implements OnInit {
 
   users = signal<User[]>([]);
   roles = signal<Role[]>([]);
+  departments = signal<{ id: string; name: string }[]>([]);
+  branches = signal<OfficeBranch[]>([]);
   allPermissions = signal<Permission[]>([]);
 
   // Search & Filters
@@ -61,10 +68,12 @@ export class UsersComponent implements OnInit {
 
   grantSelections = signal<Set<string>>(new Set());
   revokeSelections = signal<Set<string>>(new Set());
+  exemptionLoading = new Set<string>();
 
   displayName = displayName;
   initials = initials;
   roleNames = roleNames;
+  placeName = placeName;
 
   // Filtered Users List
   filteredUsers = computed(() => {
@@ -76,9 +85,9 @@ export class UsersComponent implements OnInit {
       const nameMatch =
         displayName(u).toLowerCase().includes(q) ||
         u.email.toLowerCase().includes(q) ||
-        (u.department && u.department.toLowerCase().includes(q));
+        (placeName(u.department) && placeName(u.department).toLowerCase().includes(q));
 
-      const branchMatch = branch === "ALL" || u.officeBranch === branch;
+      const branchMatch = branch === "ALL" || u.officeBranchId === branch || placeName(u.officeBranch) === branch;
       const statusMatch =
         status === "ALL" ||
         (status === "ACTIVE" && u.isActive) ||
@@ -99,9 +108,9 @@ export class UsersComponent implements OnInit {
     firstName: ["", Validators.required],
     lastName: ["", Validators.required],
     roleNames: this.fb.nonNullable.control<string[]>([]),
-    department: [""],
+    departmentId: [""],
     position: [""],
-    officeBranch: this.fb.nonNullable.control<"ABUJA" | "KANO">("ABUJA"),
+    officeBranchId: [""],
     shift: this.fb.nonNullable.control<"ONSITE" | "HYBRID" | "REMOTE">(
       "ONSITE",
     ),
@@ -110,6 +119,8 @@ export class UsersComponent implements OnInit {
   ngOnInit(): void {
     this.load();
     this.rolesService.list().subscribe((roles) => this.roles.set(roles));
+    this.departmentsService.list().subscribe((rows) => this.departments.set(rows));
+    this.branchesService.list().subscribe((rows) => this.branches.set(rows));
     this.rolesService
       .permissions()
       .subscribe((perms) => this.allPermissions.set(perms));
@@ -132,9 +143,9 @@ export class UsersComponent implements OnInit {
       firstName: "",
       lastName: "",
       roleNames: [],
-      department: "",
+      departmentId: "",
       position: "",
-      officeBranch: "ABUJA",
+      officeBranchId: "",
       shift: "ONSITE",
     });
     this.error.set(null);
@@ -164,9 +175,9 @@ export class UsersComponent implements OnInit {
         firstName: raw.firstName,
         lastName: raw.lastName,
         roleNames: raw.roleNames,
-        department: raw.department || undefined,
+        departmentId: raw.departmentId || undefined,
         position: raw.position || undefined,
-        officeBranch: raw.officeBranch,
+        officeBranchId: raw.officeBranchId || undefined,
         shift: raw.shift,
       })
       .subscribe({
@@ -280,8 +291,15 @@ export class UsersComponent implements OnInit {
   }
 
   toggleExemption(user: User): void {
-    this.usersService
-      .setAttendanceExemption(user.id, !user.attendanceExempt)
-      .subscribe(() => this.load());
+    this.exemptionLoading.add(user.id);
+    const next = !user.attendanceExempt;
+
+    this.usersService.setAttendanceExemption(user.id, next).subscribe({
+      next: () => {
+        user.attendanceExempt = next;
+      },
+      error: () => {},
+      complete: () => this.exemptionLoading.delete(user.id),
+    });
   }
 }

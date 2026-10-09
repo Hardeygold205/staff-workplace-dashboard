@@ -1,0 +1,202 @@
+<div class="min-h-screen bg-white px-4 py-10 dark:bg-black">
+  <div class="mx-auto w-full max-w-2xl">
+    <div class="mb-8 flex justify-center">
+      @if (theme.theme() === "dark") {
+        <img src="assets/logo-light.svg" alt="Workplace" class="h-10 w-auto" />
+      } @else {
+        <img src="assets/logo.svg" alt="Workplace" class="h-10 w-auto" />
+      }
+    </div>
+
+    <div class="rounded-2xl bg-surface-elevated p-8 shadow-xl">
+      <h1 class="text-lg font-semibold text-ink">Create your organization</h1>
+      <p class="mt-1 text-sm text-ink-secondary">
+        No payment. You become the organization owner and can add a logo, icon,
+        departments, and staff next.
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-6">
+        <section class="space-y-3">
+          <h2
+            class="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            Company
+          </h2>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Organization name</label
+              >
+              <input
+                formControlName="organizationName"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Legal name</label
+              >
+              <input
+                formControlName="legalName"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Industry</label
+              >
+              <input
+                formControlName="industry"
+                placeholder="Agriculture, Finance, Technology"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Staff size</label
+              >
+              <select
+                formControlName="staffRange"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+                @for (range of staffRanges; track range) {
+                  <option [value]="range">{{ range }} people</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Website</label
+              >
+              <input
+                formControlName="website"
+                placeholder="https://"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Phone</label
+              >
+              <input
+                formControlName="phone"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Registration number</label
+              >
+              <input
+                formControlName="registrationNumber"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Timezone</label
+              >
+              <input
+                formControlName="timezone"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Country</label
+              >
+              <input
+                formControlName="country"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >State</label
+              >
+              <input
+                formControlName="state"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >City</label
+              >
+              <input
+                formControlName="city"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary"
+              >Address</label
+            >
+            <input
+              formControlName="address"
+              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary"
+              >About the company</label
+            >
+            <textarea
+              formControlName="about"
+              rows="3"
+              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink"></textarea>
+          </div>
+        </section>
+
+        <section class="space-y-3">
+          <h2
+            class="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            Owner account
+          </h2>
+          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >First name</label
+              >
+              <input
+                formControlName="ownerFirstName"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+            <div>
+              <label class="mb-1 block text-xs font-medium text-ink-secondary"
+                >Last name</label
+              >
+              <input
+                formControlName="ownerLastName"
+                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+            </div>
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary"
+              >Work email</label
+            >
+            <input
+              type="email"
+              formControlName="ownerEmail"
+              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary"
+              >Password</label
+            >
+            <input
+              type="password"
+              formControlName="ownerPassword"
+              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+        </section>
+
+        @if (error()) {
+          <p
+            class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+            {{ error() }}
+          </p>
+        }
+
+        <app-button type="submit" [fullWidth]="true" [loading]="submitting()"
+          >Create organization</app-button
+        >
+      </form>
+    </div>
+
+    <p class="mt-6 text-center text-xs text-ink-muted">
+      Already have an account?
+      <a routerLink="/login" class="font-medium text-brand-green">Sign in</a>
+    </p>
+  </div>
+</div>

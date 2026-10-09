@@ -1,0 +1,39 @@
+<div class="flex min-h-screen items-center justify-center bg-white px-4 dark:bg-black">
+  <div class="w-full max-w-sm">
+    <div class="mb-8 flex justify-center">
+      <img src="assets/logo.svg" alt="Workplace" class="h-10 w-auto" />
+    </div>
+    <div class="rounded-2xl bg-surface-elevated p-8 shadow-xl">
+      <h1 class="text-lg font-semibold text-ink">Accept invitation</h1>
+      <p class="mt-1 text-sm text-ink-secondary">Create your staff account for this organization.</p>
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary">Invitation token</label>
+          <input formControlName="token" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">First name</label>
+            <input formControlName="firstName" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+          <div>
+            <label class="mb-1 block text-xs font-medium text-ink-secondary">Last name</label>
+            <input formControlName="lastName" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+          </div>
+        </div>
+        <div>
+          <label class="mb-1 block text-xs font-medium text-ink-secondary">Password</label>
+          <input type="password" formControlName="password" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+        </div>
+        @if (error()) {
+          <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+        }
+        <app-button type="submit" [fullWidth]="true" [loading]="submitting()">Join organization</app-button>
+      </form>
+    </div>
+    <p class="mt-6 text-center text-xs text-ink-muted">
+      Already have an account?
+      <a routerLink="/login" class="font-medium text-brand-green">Sign in</a>
+    </p>
+  </div>
+</div>

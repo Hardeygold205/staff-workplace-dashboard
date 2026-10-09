@@ -1,0 +1,60 @@
+<app-page-header title="Branches" subtitle="Offices this organization works from. Staff are assigned to a branch.">
+  @if (auth.hasPermission("branches:manage")) {
+    <app-button (click)="startCreate()">New branch</app-button>
+  }
+</app-page-header>
+
+@if (loading()) {
+  <app-spinner />
+} @else if (branches().length === 0) {
+  <app-card class="block">
+    <app-empty-state title="No branches yet" subtitle="Add each office, city, or site. They are no longer limited to Abuja and Kano." />
+  </app-card>
+} @else {
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+    @for (branch of branches(); track branch.id) {
+      <app-card [title]="branch.name" class="block">
+        <app-badge class="mb-3" [tone]="branch.isActive ? 'success' : 'neutral'">{{ branch.isActive ? "Active" : "Inactive" }}</app-badge>
+        <p class="text-sm text-ink">{{ place(branch) }}</p>
+        <p class="mb-4 mt-1 text-xs text-ink-muted">{{ branch.address || "No street address" }}</p>
+        @if (auth.hasPermission("branches:manage") && branch.isActive) {
+          <div class="flex gap-2">
+            <app-button variant="secondary" (click)="startEdit(branch)">Edit</app-button>
+            <app-button variant="ghost" (click)="deactivate(branch)">Deactivate</app-button>
+          </div>
+        }
+      </app-card>
+    }
+  </div>
+}
+
+<app-modal [open]="open()" [title]="editing() ? 'Edit branch' : 'New branch'" (close)="open.set(false)">
+  <form [formGroup]="form" (ngSubmit)="save()" class="space-y-3">
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Name</label>
+      <input formControlName="name" placeholder="Lagos HQ" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Address</label>
+      <input formControlName="address" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+    </div>
+    <div class="grid grid-cols-2 gap-3">
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary">City</label>
+        <input formControlName="city" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+      </div>
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary">State</label>
+        <input formControlName="state" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+      </div>
+    </div>
+    <div>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary">Country</label>
+      <input formControlName="country" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
+    </div>
+    @if (error()) {
+      <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+    }
+    <app-button type="submit" [fullWidth]="true" [loading]="saving()">Save branch</app-button>
+  </form>
+</app-modal>

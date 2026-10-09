@@ -1,24 +1,89 @@
-<app-page-header title="Uploads" subtitle="Documents, images, audio, and video — attach them to a project, task, or request, or upload standalone." />
+<app-page-header
+  title="Uploads"
+  subtitle="Choose a folder, then pick the project, task, request, or person. You do not paste an id." />
 
 <app-card class="mb-6 block">
   <div class="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
     <div>
-      <label class="mb-1 block text-xs font-medium text-ink-secondary">Folder (optional)</label>
-      <select [(ngModel)]="selectedFolder" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
-        <option value="">No folder (standalone)</option>
+      <label class="mb-1 block text-xs font-medium text-ink-secondary"
+        >Folder</label
+      >
+      <select
+        [(ngModel)]="selectedFolder"
+        (ngModelChange)="onFolderChange()"
+        class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+        <option value="">Standalone file</option>
         @for (folder of folders; track folder) {
           <option [value]="folder">{{ folder }}</option>
         }
       </select>
     </div>
-    <div>
-      <label class="mb-1 block text-xs font-medium text-ink-secondary">Owner/Entity ID (optional)</label>
-      <input
-        [(ngModel)]="entityId"
-        placeholder="e.g. the project or request ID"
-        class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink"
-      />
-    </div>
+
+    @if (selectedFolder === "PROJECT" || selectedFolder === "TASK") {
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Project</label
+        >
+        <select
+          [(ngModel)]="selectedProjectId"
+          (ngModelChange)="onProjectChange()"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+          <option value="">Select a project</option>
+          @for (project of projects(); track project.id) {
+            <option [value]="project.id">{{ project.name }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    @if (selectedFolder === "TASK") {
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Task</label
+        >
+        <select
+          [(ngModel)]="selectedEntityId"
+          (ngModelChange)="load()"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+          <option value="">Select a task</option>
+          @for (task of tasks(); track task.id) {
+            <option [value]="task.id">{{ task.title }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    @if (selectedFolder === "REQUEST") {
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Request</label
+        >
+        <select
+          [(ngModel)]="selectedEntityId"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+          <option value="">Select a request</option>
+          @for (request of requests(); track request.id) {
+            <option [value]="request.id">{{ request.subject }}</option>
+          }
+        </select>
+      </div>
+    }
+
+    @if (selectedFolder === "USER") {
+      <div>
+        <label class="mb-1 block text-xs font-medium text-ink-secondary"
+          >Person</label
+        >
+        <select
+          [(ngModel)]="selectedEntityId"
+          class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
+          <option value="">Select a person</option>
+          @for (person of staff(); track person.id) {
+            <option [value]="person.id">{{ displayName(person) }}</option>
+          }
+        </select>
+      </div>
+    }
   </div>
 
   <label
@@ -27,50 +92,157 @@
     [class.border-line]="!dragOver()"
     (dragover)="$event.preventDefault(); dragOver.set(true)"
     (dragleave)="dragOver.set(false)"
-    (drop)="onDrop($event)"
-  >
-    <input type="file" multiple class="hidden" (change)="onFileSelected($event)" />
-    <svg class="mb-2 h-8 w-8 text-ink-muted" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3-3m0 0l3 3m-3-3v8" />
-    </svg>
-    <p class="text-sm font-medium text-ink">Drop files here, or click to browse</p>
-    <p class="mt-1 text-xs text-ink-muted">Docs, images, audio, and video — up to 500MB each</p>
+    (drop)="onDrop($event)">
+    <input
+      type="file"
+      multiple
+      class="hidden"
+      (change)="onFileSelected($event)" />
+    <p class="text-sm font-medium text-ink">
+      Drop files here, or click to browse
+    </p>
+    <p class="mt-1 text-xs text-ink-muted">Docs, images, audio, and video</p>
     @if (uploading()) {
       <p class="mt-2 text-xs text-brand-green">Uploading…</p>
     }
   </label>
 
   @if (error()) {
-    <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">{{ error() }}</p>
+    <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ error() }}
+    </p>
   }
 </app-card>
 
 <app-card title="Files" class="block">
   @if (loading()) {
     <app-spinner />
+  } @else if (loadError()) {
+    <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+      {{ loadError() }}
+    </p>
   } @else if (uploads().length === 0) {
     <app-empty-state title="No files yet" />
   } @else {
     <div class="divide-y divide-line">
       @for (file of uploads(); track file.id) {
         <div class="flex items-center justify-between py-3">
-          <div class="flex items-center gap-3">
-            <span class="text-xl">{{ fileIcon(file.mimeType) }}</span>
-            <div>
-              <p class="text-sm font-medium text-ink">{{ file.originalName }}</p>
-              <p class="text-xs text-ink-muted">
-                {{ formatSize(file.sizeBytes) }}
-                @if (file.entityType) { · {{ file.entityType }} }
-                · {{ file.createdAt | date: 'MMM d, y' }}
-              </p>
-            </div>
+          <div>
+            <p class="text-sm font-medium text-ink">{{ file.originalName }}</p>
+            <p class="text-xs text-ink-muted">
+              {{ formatSize(file.sizeBytes) }}
+              @if (file.entityType) {
+                · {{ file.entityType }}
+              }
+              · {{ file.createdAt | date: "MMM d, y" }}
+            </p>
           </div>
           <div class="flex items-center gap-3">
-            <button type="button" (click)="download(file)" class="text-xs font-medium text-brand-green hover:underline">Download</button>
-            <button type="button" (click)="remove(file)" class="text-xs font-medium text-red-500 hover:underline">Delete</button>
+            <button
+              type="button"
+              (click)="download(file)"
+              class="text-xs font-medium text-brand-green hover:underline">
+              Download
+            </button>
+            <button
+              type="button"
+              (click)="view(file)"
+              class="text-xs font-medium text-ink-secondary hover:underline">
+              View
+            </button>
+            <button
+              type="button"
+              (click)="remove(file)"
+              class="text-xs font-medium text-red-500 hover:underline">
+              Delete
+            </button>
           </div>
         </div>
       }
     </div>
   }
 </app-card>
+
+@if (viewing(); as file) {
+  <div
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+    (click)="closeViewer()">
+    <div
+      class="flex h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-surface"
+      (click)="$event.stopPropagation()">
+      <div
+        class="flex items-center justify-between border-b border-line px-4 py-3">
+        <p class="truncate text-sm font-medium text-ink">
+          {{ file.originalName }}
+        </p>
+        <div class="flex items-center gap-3">
+          <button
+            type="button"
+            (click)="download(file)"
+            class="text-xs font-medium text-brand-green hover:underline">
+            Download
+          </button>
+          <button
+            type="button"
+            (click)="view(file)"
+            class="text-xs font-medium text-ink-secondary hover:underline">
+            View
+          </button>
+          <button
+            type="button"
+            (click)="closeViewer()"
+            class="text-xs font-medium text-ink-secondary hover:underline">
+            Close
+          </button>
+        </div>
+      </div>
+
+      <div class="min-h-0 flex-1 overflow-auto p-2">
+        @if (viewLoading()) {
+          <app-spinner />
+        } @else if (viewError()) {
+          <p class="p-4 text-sm text-red-700">{{ viewError() }}</p>
+        } @else {
+          @switch (viewKind()) {
+            @case ("image") {
+              <img
+                [src]="viewUrl()"
+                [alt]="file.originalName"
+                class="mx-auto max-h-full max-w-full object-contain" />
+            }
+            @case ("pdf") {
+              <iframe
+                [src]="viewUrl()"
+                [title]="file.originalName"
+                class="h-full w-full rounded border-0"></iframe>
+            }
+            @case ("video") {
+              <video
+                [src]="viewUrl()"
+                controls
+                class="mx-auto max-h-full max-w-full"></video>
+            }
+            @case ("audio") {
+              <audio
+                [src]="viewUrl()"
+                controls
+                class="mx-auto mt-8 w-full max-w-xl"></audio>
+            }
+            @case ("text") {
+              <pre
+                class="whitespace-pre-wrap wrap-break-word p-4 text-xs text-ink"
+                >{{ viewText() }}</pre
+              >
+            }
+            @default {
+              <p class="p-6 text-sm text-ink-secondary">
+                This file type can't be previewed in the browser. Use Download
+                to open it.
+              </p>
+            }
+          }
+        }
+      </div>
+    </div>
+  </div>
+}

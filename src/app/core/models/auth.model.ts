@@ -20,6 +20,8 @@ export interface JwtPayload {
   email: string;
   roles: string[];
   permissions: string[];
+  orgId?: string | null;
+  isPlatformAdmin?: boolean;
   jti: string;
   exp: number;
   iat: number;

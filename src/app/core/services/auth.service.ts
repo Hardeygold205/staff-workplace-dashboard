@@ -43,6 +43,7 @@ export class AuthService {
     () => this.payloadSignal()?.permissions ?? [],
   );
   readonly userId = computed(() => this.payloadSignal()?.sub ?? null);
+  readonly isPlatformAdmin = computed(() => this.payloadSignal()?.isPlatformAdmin === true);
 
   hasPermission(key: string): boolean {
     return this.permissions().includes(key);
@@ -59,6 +60,17 @@ export class AuthService {
   login(payload: LoginPayload): Observable<LoginResponse> {
     return this.http
       .post<LoginResponse>(`${environment.apiUrl}/auth/login`, payload)
+      .pipe(tap((res) => this.setTokens(res.accessToken, res.refreshToken)));
+  }
+
+  acceptInvitation(payload: {
+    token: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+  }): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${environment.apiUrl}/auth/accept-invitation`, payload)
       .pipe(tap((res) => this.setTokens(res.accessToken, res.refreshToken)));
   }
 
@@ -106,6 +118,10 @@ export class AuthService {
 
   getRefreshToken(): string | null {
     return localStorage.getItem(REFRESH_TOKEN_KEY);
+  }
+
+  adoptSession(accessToken: string, refreshToken: string): void {
+    this.setTokens(accessToken, refreshToken);
   }
 
   private setTokens(accessToken: string, refreshToken: string): void {

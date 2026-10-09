@@ -1,12 +1,15 @@
-import { Directive, Input, TemplateRef, ViewContainerRef, effect, inject } from '@angular/core';
-import { AuthService } from '../services/auth.service';
+import {
+  Directive,
+  Input,
+  TemplateRef,
+  ViewContainerRef,
+  effect,
+  inject,
+} from "@angular/core";
+import { AuthService } from "../services/auth.service";
 
-/**
- * Structural directive: *appHasPermission="'requests:approve'"
- * Also accepts an array for "any of": *appHasPermission="['requests:view_all', 'requests:approve']"
- */
 @Directive({
-  selector: '[appHasPermission]',
+  selector: "[appHasPermission]",
   standalone: true,
 })
 export class HasPermissionDirective {
@@ -23,7 +26,7 @@ export class HasPermissionDirective {
 
   constructor() {
     effect(() => {
-      this.auth.permissions(); // re-run whenever permissions change (e.g. after token refresh)
+      this.auth.permissions();
       this.render();
     });
   }

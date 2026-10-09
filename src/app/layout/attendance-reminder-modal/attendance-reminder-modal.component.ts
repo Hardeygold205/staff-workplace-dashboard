@@ -86,9 +86,6 @@ export class AttendanceReminderModalComponent {
   doCheckOut(): void {
     this.submitting.set(true);
     this.error.set(null);
-    // Checkout outside the 5–6pm grace window may require a reason on the backend —
-    // if that happens here, route the user to the Attendance page where the full
-    // reason picker lives, rather than duplicating that form inside this modal.
     this.attendance.checkOut().subscribe({
       next: () => {
         this.submitting.set(false);

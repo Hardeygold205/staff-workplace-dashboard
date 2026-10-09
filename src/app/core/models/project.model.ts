@@ -1,8 +1,11 @@
-export type ProjectStatus = 'PLANNING' | 'ACTIVE' | 'ON_HOLD' | 'COMPLETED';
+export type ProjectStatus = "PLANNING" | "ACTIVE" | "ON_HOLD" | "COMPLETED";
+export type ProjectVisibility = "PUBLIC" | "DEPARTMENT" | "PRIVATE";
+export type ProjectMemberRole = "OWNER" | "MANAGER" | "MEMBER" | "VIEWER";
 
 export interface ProjectMember {
   userId: string;
-  roleInProject: string;
+  role: ProjectMemberRole;
+  roleInProject?: string;
   user?: { id: string; firstName: string; lastName: string };
 }
 
@@ -11,6 +14,9 @@ export interface Project {
   name: string;
   description?: string | null;
   status: ProjectStatus;
+  visibility?: ProjectVisibility;
+  departmentId?: string | null;
+  department?: { id: string; name: string } | null;
   startDate?: string | null;
   endDate?: string | null;
   createdById: string;
@@ -24,9 +30,12 @@ export interface Project {
 export interface CreateProjectPayload {
   name: string;
   description?: string;
-  startDate?: string;
-  endDate?: string;
-  memberUserIds?: string[];
+  departmentId?: string | null;
+  visibility?: ProjectVisibility;
+  status?: ProjectStatus;
+  startDate?: string | null;
+  endDate?: string | null;
+  members?: { userId: string; role: ProjectMemberRole }[];
 }
 
 export interface UpdateProjectStatusPayload {
