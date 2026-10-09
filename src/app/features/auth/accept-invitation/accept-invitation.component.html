@@ -6,60 +6,95 @@
     'Set the name colleagues will see',
     'Choose a password of at least 8 characters',
   ]">
-  <div class="auth-form">
-    <h1>Accept invitation</h1>
-    <p class="auth-form-lede">
-      This creates your staff account for the organization that invited you.
-      If you already have an account, sign in instead.
-    </p>
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-bold tracking-tight text-ink sm:text-3xl">Accept invitation</h1>
+      <p class="text-sm text-ink-muted leading-relaxed">
+        This creates your staff account for the organization that invited you.
+      </p>
+    </div>
 
-    <form [formGroup]="form" (ngSubmit)="submit()" class="field-stack" novalidate>
-      <div>
-        <label class="field-label" for="token">Invitation token</label>
-        <input id="token" formControlName="token" autocomplete="off" class="field" />
-        <p class="field-hint">Paste the token from the invitation if it was not filled in for you.</p>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4" novalidate>
+      <!-- Token Input -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="token">Invitation token</label>
+        <input
+          id="token"
+          formControlName="token"
+          autocomplete="off"
+          placeholder="e.g. inv_8f9a2b3c"
+          class="w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+          [class.border-danger]="form.controls.token.touched && form.controls.token.invalid"
+          [class.border-surface-border]="!(form.controls.token.touched && form.controls.token.invalid)" />
+        <p class="text-xs text-ink-muted">Paste the token from the invitation if it was not filled in for you.</p>
         @if (form.controls.token.touched && form.controls.token.invalid) {
-          <p class="field-error">An invitation token is required.</p>
+          <p class="text-xs font-medium text-danger">An invitation token is required.</p>
         }
       </div>
-      <div class="field-grid">
-        <div>
-          <label class="field-label" for="firstName">First name</label>
-          <input id="firstName" formControlName="firstName" autocomplete="given-name" class="field" />
+
+      <!-- First Name & Last Name Grid -->
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="firstName">First name</label>
+          <input
+            id="firstName"
+            formControlName="firstName"
+            autocomplete="given-name"
+            placeholder="Jane"
+            class="w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+            [class.border-danger]="form.controls.firstName.touched && form.controls.firstName.invalid"
+            [class.border-surface-border]="!(form.controls.firstName.touched && form.controls.firstName.invalid)" />
           @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
-            <p class="field-error">Enter your first name.</p>
+            <p class="text-xs font-medium text-danger">First name is required.</p>
           }
         </div>
-        <div>
-          <label class="field-label" for="lastName">Last name</label>
-          <input id="lastName" formControlName="lastName" autocomplete="family-name" class="field" />
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="lastName">Last name</label>
+          <input
+            id="lastName"
+            formControlName="lastName"
+            autocomplete="family-name"
+            placeholder="Doe"
+            class="w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+            [class.border-danger]="form.controls.lastName.touched && form.controls.lastName.invalid"
+            [class.border-surface-border]="!(form.controls.lastName.touched && form.controls.lastName.invalid)" />
           @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
-            <p class="field-error">Enter your last name.</p>
+            <p class="text-xs font-medium text-danger">Last name is required.</p>
           }
         </div>
       </div>
-      <div>
-        <label class="field-label" for="password">Password</label>
-        <div class="field-affix">
+
+      <!-- Password Input -->
+      <div class="space-y-1.5">
+        <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="password">Password</label>
+        <div class="relative flex items-center">
           <input
             id="password"
             [type]="showPassword() ? 'text' : 'password'"
             formControlName="password"
             autocomplete="new-password"
-            class="field" />
-          <button type="button" class="field-affix-btn" (click)="showPassword.set(!showPassword())">
+            placeholder="••••••••"
+            class="w-full rounded-lg border bg-surface py-2.5 pl-3.5 pr-12 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+            [class.border-danger]="form.controls.password.touched && form.controls.password.invalid"
+            [class.border-surface-border]="!(form.controls.password.touched && form.controls.password.invalid)" />
+          <button
+            type="button"
+            class="absolute right-3 text-xs font-semibold text-accent hover:text-accent-ink focus:outline-none"
+            (click)="showPassword.set(!showPassword())">
             {{ showPassword() ? 'Hide' : 'Show' }}
           </button>
         </div>
         @if (form.controls.password.touched && form.controls.password.invalid) {
-          <p class="field-error">Use at least 8 characters.</p>
+          <p class="text-xs font-medium text-danger">Use at least 8 characters.</p>
         } @else {
-          <p class="field-hint">At least 8 characters.</p>
+          <p class="text-xs text-ink-muted">Must be at least 8 characters long.</p>
         }
       </div>
 
       @if (error()) {
-        <p class="alert-danger">{{ error() }}</p>
+        <div class="rounded-lg border border-danger/20 bg-danger/10 p-3.5 text-xs font-medium text-danger">
+          {{ error() }}
+        </div>
       }
 
       <app-button type="submit" [fullWidth]="true" [loading]="submitting()">
@@ -67,9 +102,9 @@
       </app-button>
     </form>
 
-    <p class="auth-switch">
+    <p class="border-t border-surface-border pt-4 text-center text-xs text-ink-muted">
       Already have an account?
-      <a routerLink="/login">Sign in</a>
+      <a routerLink="/login" class="font-semibold text-accent hover:underline">Sign in</a>
     </p>
   </div>
 </app-auth-shell>

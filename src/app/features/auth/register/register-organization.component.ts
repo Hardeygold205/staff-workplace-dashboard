@@ -22,7 +22,13 @@ const TIMEZONES = [
 @Component({
   selector: "app-register-organization",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, RouterLink, AuthShellComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonComponent,
+    RouterLink,
+    AuthShellComponent,
+  ],
   templateUrl: "./register-organization.component.html",
 })
 export class RegisterOrganizationComponent {

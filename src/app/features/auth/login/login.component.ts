@@ -9,7 +9,13 @@ import { AuthShellComponent } from "../auth-shell/auth-shell.component";
 @Component({
   selector: "app-login",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, RouterLink, AuthShellComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonComponent,
+    RouterLink,
+    AuthShellComponent,
+  ],
   templateUrl: "./login.component.html",
 })
 export class LoginComponent {

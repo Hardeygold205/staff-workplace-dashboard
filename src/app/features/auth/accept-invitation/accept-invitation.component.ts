@@ -9,7 +9,13 @@ import { AuthShellComponent } from "../auth-shell/auth-shell.component";
 @Component({
   selector: "app-accept-invitation",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, RouterLink, AuthShellComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ButtonComponent,
+    RouterLink,
+    AuthShellComponent,
+  ],
   templateUrl: "./accept-invitation.component.html",
 })
 export class AcceptInvitationComponent {
@@ -23,7 +29,10 @@ export class AcceptInvitationComponent {
   showPassword = signal(false);
 
   form = this.fb.nonNullable.group({
-    token: [this.route.snapshot.queryParamMap.get("token") ?? "", Validators.required],
+    token: [
+      this.route.snapshot.queryParamMap.get("token") ?? "",
+      Validators.required,
+    ],
     firstName: ["", Validators.required],
     lastName: ["", Validators.required],
     password: ["", [Validators.required, Validators.minLength(8)]],
@@ -40,7 +49,9 @@ export class AcceptInvitationComponent {
       next: () => this.router.navigate(["/dashboard"]),
       error: (err) => {
         this.submitting.set(false);
-        this.error.set(err?.error?.message ?? "This invitation could not be accepted.");
+        this.error.set(
+          err?.error?.message ?? "This invitation could not be accepted.",
+        );
       },
     });
   }

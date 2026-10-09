@@ -6,248 +6,309 @@
     'Add contact and location when you have them',
     'Finish with the account that will administer it',
   ]">
-  <div class="auth-form auth-form-wide">
-    <h1>
-      @switch (step()) {
-        @case (1) { What should we call the workplace? }
-        @case (2) { How can people reach the company? }
-        @case (3) { Where does the company operate? }
-        @case (4) { Create the owner account }
-      }
-    </h1>
-    <p class="auth-form-lede">
-      @switch (step()) {
-        @case (1) {
-          This is the name staff see on invitations, attendance, and the
-          sidebar. The legal name can differ. You can change either later.
+  <div class="space-y-6">
+    <div class="space-y-2">
+      <h1 class="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+        @switch (step()) {
+          @case (1) { What should we call the workplace? }
+          @case (2) { How can people reach the company? }
+          @case (3) { Where does the company operate? }
+          @case (4) { Create the owner account }
         }
-        @case (2) {
-          Optional. Add a website, phone, registration number, and timezone
-          so invitations and records stay accurate.
-        }
-        @case (3) {
-          Set the primary office. Branches can be added after you sign in. A
-          short description helps new staff recognize the organization.
-        }
-        @case (4) {
-          This account administers staff, roles, attendance, and settings.
-          You will sign in with this work email. Other admins can be invited
-          once you are inside.
-        }
-      }
-    </p>
-
-    <ol class="stepper" aria-label="Setup progress">
-      @for (item of steps; track item.id) {
-        <li [class.is-current]="step() === item.id" [class.is-done]="step() > item.id">
-          <button type="button" (click)="goTo(item.id)">
-            <span class="step-track"></span>
-            <span class="step-label">{{ item.id }}. {{ item.label }}</span>
-          </button>
-        </li>
-      }
-    </ol>
-
-    <form [formGroup]="form" (ngSubmit)="submit()" class="field-stack" novalidate>
-      @if (step() === 1) {
-        <div>
-          <label class="field-label" for="organizationName">Organization name</label>
-          <input
-            id="organizationName"
-            formControlName="organizationName"
-            autocomplete="organization"
-            placeholder="Extension Africa"
-            class="field" />
-          @if (showError('organizationName')) {
-            <p class="field-error">Enter the name staff will see. At least 2 characters.</p>
+      </h1>
+      <p class="text-sm text-ink-muted leading-relaxed">
+        @switch (step()) {
+          @case (1) {
+            This is the name staff see on invitations, attendance, and the sidebar.
           }
-        </div>
-        <div class="field-grid">
-          <div>
-            <label class="field-label" for="legalName">Legal name</label>
+          @case (2) {
+            Optional details so invitations and records stay accurate.
+          }
+          @case (3) {
+            Set your primary office location and company details.
+          }
+          @case (4) {
+            This account administers staff, roles, attendance, and settings.
+          }
+        }
+      </p>
+    </div>
+
+    <!-- Multi-step Wizard Indicator -->
+    <nav aria-label="Setup progress" class="py-2">
+      <ol class="flex items-center gap-2">
+        @for (item of steps; track item.id) {
+          <li class="flex-1">
+            <button
+              type="button"
+              (click)="goTo(item.id)"
+              class="group flex w-full flex-col gap-1.5 text-left focus:outline-none">
+              <div
+                class="h-1.5 w-full rounded-full transition-colors"
+                [class.bg-accent]="step() >= item.id"
+                [class.bg-surface-border]="step() < item.id"></div>
+              <span
+                class="text-[11px] font-semibold tracking-wider uppercase transition-colors"
+                [class.text-accent]="step() === item.id"
+                [class.text-ink-muted]="step() !== item.id">
+                {{ item.id }}. {{ item.label }}
+              </span>
+            </button>
+          </li>
+        }
+      </ol>
+    </nav>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="space-y-4" novalidate>
+      <!-- STEP 1: Organization Basic Info -->
+      @if (step() === 1) {
+        <div class="space-y-4">
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="organizationName">Organization name</label>
             <input
-              id="legalName"
-              formControlName="legalName"
+              id="organizationName"
+              formControlName="organizationName"
               autocomplete="organization"
-              placeholder="If it differs from the workplace name"
-              class="field" />
+              placeholder="e.g. Acme Corp"
+              class="w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+              [class.border-danger]="showError('organizationName')"
+              [class.border-surface-border]="!showError('organizationName')" />
+            @if (showError('organizationName')) {
+              <p class="text-xs font-medium text-danger">Enter the organization name (at least 2 characters).</p>
+            }
           </div>
-          <div>
-            <label class="field-label" for="industry">Industry</label>
-            <input
-              id="industry"
-              formControlName="industry"
-              placeholder="Agriculture, finance, technology"
-              class="field" />
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="legalName">Legal name</label>
+              <input
+                id="legalName"
+                formControlName="legalName"
+                autocomplete="organization"
+                placeholder="Official registered name"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="industry">Industry</label>
+              <input
+                id="industry"
+                formControlName="industry"
+                placeholder="Technology, Finance..."
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
           </div>
-          <div class="span-2">
-            <label class="field-label" for="staffRange">Staff size</label>
-            <select id="staffRange" formControlName="staffRange" class="field">
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="staffRange">Staff size</label>
+            <select
+              id="staffRange"
+              formControlName="staffRange"
+              class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20">
               @for (range of staffRanges; track range) {
                 <option [value]="range">{{ range }} people</option>
               }
             </select>
-            <p class="field-hint">An estimate is enough. It is not a seat limit.</p>
           </div>
         </div>
       }
 
+      <!-- STEP 2: Contact Info -->
       @if (step() === 2) {
-        <div class="field-grid">
-          <div>
-            <label class="field-label" for="website">Website</label>
-            <input
-              id="website"
-              formControlName="website"
-              inputmode="url"
-              autocomplete="url"
-              placeholder="https://"
-              class="field" />
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="website">Website</label>
+              <input
+                id="website"
+                formControlName="website"
+                inputmode="url"
+                autocomplete="url"
+                placeholder="https://example.com"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="phone">Phone</label>
+              <input
+                id="phone"
+                formControlName="phone"
+                type="tel"
+                autocomplete="tel"
+                placeholder="+234..."
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
           </div>
-          <div>
-            <label class="field-label" for="phone">Phone</label>
-            <input
-              id="phone"
-              formControlName="phone"
-              type="tel"
-              autocomplete="tel"
-              placeholder="+234"
-              class="field" />
-          </div>
-          <div>
-            <label class="field-label" for="registrationNumber">Registration number</label>
-            <input
-              id="registrationNumber"
-              formControlName="registrationNumber"
-              placeholder="CAC or equivalent"
-              class="field" />
-          </div>
-          <div>
-            <label class="field-label" for="timezone">Timezone</label>
-            <select id="timezone" formControlName="timezone" class="field">
-              @for (zone of timezones; track zone) {
-                <option [value]="zone">{{ zone }}</option>
-              }
-            </select>
-            <p class="field-hint">Attendance windows use this timezone.</p>
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="registrationNumber">Registration number</label>
+              <input
+                id="registrationNumber"
+                formControlName="registrationNumber"
+                placeholder="RC / CAC Number"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="timezone">Timezone</label>
+              <select
+                id="timezone"
+                formControlName="timezone"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20">
+                @for (zone of timezones; track zone) {
+                  <option [value]="zone">{{ zone }}</option>
+                }
+              </select>
+            </div>
           </div>
         </div>
       }
 
+      <!-- STEP 3: Location Details -->
       @if (step() === 3) {
-        <div class="field-grid">
-          <div>
-            <label class="field-label" for="country">Country</label>
-            <input id="country" formControlName="country" autocomplete="country-name" class="field" />
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="country">Country</label>
+              <input
+                id="country"
+                formControlName="country"
+                autocomplete="country-name"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="state">State</label>
+              <input
+                id="state"
+                formControlName="state"
+                autocomplete="address-level1"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
           </div>
-          <div>
-            <label class="field-label" for="state">State</label>
-            <input id="state" formControlName="state" autocomplete="address-level1" class="field" />
+
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="city">City</label>
+              <input
+                id="city"
+                formControlName="city"
+                autocomplete="address-level2"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="address">Street address</label>
+              <input
+                id="address"
+                formControlName="address"
+                autocomplete="street-address"
+                class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all focus:border-accent focus:ring-2 focus:ring-accent/20" />
+            </div>
           </div>
-          <div>
-            <label class="field-label" for="city">City</label>
-            <input id="city" formControlName="city" autocomplete="address-level2" class="field" />
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="about">About the company</label>
+            <textarea
+              id="about"
+              formControlName="about"
+              rows="3"
+              placeholder="Brief description of the organization..."
+              class="w-full rounded-lg border border-surface-border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"></textarea>
           </div>
-          <div>
-            <label class="field-label" for="address">Street address</label>
-            <input id="address" formControlName="address" autocomplete="street-address" class="field" />
-          </div>
-        </div>
-        <div>
-          <label class="field-label" for="about">About the company</label>
-          <textarea
-            id="about"
-            formControlName="about"
-            rows="4"
-            placeholder="What the organization does, in a sentence or two."
-            class="field"></textarea>
-          <p class="field-hint">Shown to staff when they join. You can leave this blank.</p>
         </div>
       }
 
+      <!-- STEP 4: Owner Account -->
       @if (step() === 4) {
-        <p class="field-hint">
-          Creating
-          <strong class="text-ink">{{ form.controls.organizationName.value }}</strong>.
-          This person is the organization owner.
-        </p>
-        <div class="field-grid">
-          <div>
-            <label class="field-label" for="ownerFirstName">First name</label>
+        <div class="space-y-4">
+          <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="ownerFirstName">First name</label>
+              <input
+                id="ownerFirstName"
+                formControlName="ownerFirstName"
+                autocomplete="given-name"
+                class="w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                [class.border-danger]="showError('ownerFirstName')"
+                [class.border-surface-border]="!showError('ownerFirstName')" />
+              @if (showError('ownerFirstName')) {
+                <p class="text-xs font-medium text-danger">First name is required.</p>
+              }
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="ownerLastName">Last name</label>
+              <input
+                id="ownerLastName"
+                formControlName="ownerLastName"
+                autocomplete="family-name"
+                class="w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                [class.border-danger]="showError('ownerLastName')"
+                [class.border-surface-border]="!showError('ownerLastName')" />
+              @if (showError('ownerLastName')) {
+                <p class="text-xs font-medium text-danger">Last name is required.</p>
+              }
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="ownerEmail">Work email</label>
             <input
-              id="ownerFirstName"
-              formControlName="ownerFirstName"
-              autocomplete="given-name"
-              class="field" />
-            @if (showError('ownerFirstName')) {
-              <p class="field-error">Enter the owner's first name.</p>
+              id="ownerEmail"
+              type="email"
+              formControlName="ownerEmail"
+              autocomplete="email"
+              placeholder="you@company.com"
+              class="w-full rounded-lg border bg-surface px-3.5 py-2.5 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+              [class.border-danger]="showError('ownerEmail')"
+              [class.border-surface-border]="!showError('ownerEmail')" />
+            @if (showError('ownerEmail')) {
+              <p class="text-xs font-medium text-danger">
+                {{ form.controls.ownerEmail.hasError('email') ? 'Enter a valid email address.' : 'Email is required.' }}
+              </p>
             }
           </div>
-          <div>
-            <label class="field-label" for="ownerLastName">Last name</label>
-            <input
-              id="ownerLastName"
-              formControlName="ownerLastName"
-              autocomplete="family-name"
-              class="field" />
-            @if (showError('ownerLastName')) {
-              <p class="field-error">Enter the owner's last name.</p>
+
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold uppercase tracking-wider text-ink-muted" for="ownerPassword">Password</label>
+            <div class="relative flex items-center">
+              <input
+                id="ownerPassword"
+                [type]="showPassword() ? 'text' : 'password'"
+                formControlName="ownerPassword"
+                autocomplete="new-password"
+                placeholder="••••••••"
+                class="w-full rounded-lg border bg-surface py-2.5 pl-3.5 pr-12 text-sm text-ink outline-none transition-all placeholder:text-ink-muted/50 focus:border-accent focus:ring-2 focus:ring-accent/20"
+                [class.border-danger]="showError('ownerPassword')"
+                [class.border-surface-border]="!showError('ownerPassword')" />
+              <button
+                type="button"
+                class="absolute right-3 text-xs font-semibold text-accent hover:text-accent-ink focus:outline-none"
+                (click)="showPassword.set(!showPassword())">
+                {{ showPassword() ? 'Hide' : 'Show' }}
+              </button>
+            </div>
+            @if (showError('ownerPassword')) {
+              <p class="text-xs font-medium text-danger">Password must be at least 8 characters long.</p>
             }
           </div>
-        </div>
-        <div>
-          <label class="field-label" for="ownerEmail">Work email</label>
-          <input
-            id="ownerEmail"
-            type="email"
-            formControlName="ownerEmail"
-            autocomplete="email"
-            placeholder="you@company.com"
-            class="field" />
-          @if (showError('ownerEmail')) {
-            <p class="field-error">
-              {{
-                form.controls.ownerEmail.hasError('email')
-                  ? 'That email does not look valid.'
-                  : 'Enter the work email for this account.'
-              }}
-            </p>
-          }
-        </div>
-        <div>
-          <label class="field-label" for="ownerPassword">Password</label>
-          <div class="field-affix">
-            <input
-              id="ownerPassword"
-              [type]="showPassword() ? 'text' : 'password'"
-              formControlName="ownerPassword"
-              autocomplete="new-password"
-              class="field" />
-            <button
-              type="button"
-              class="field-affix-btn"
-              (click)="showPassword.set(!showPassword())">
-              {{ showPassword() ? 'Hide' : 'Show' }}
-            </button>
-          </div>
-          @if (showError('ownerPassword')) {
-            <p class="field-error">Use at least 8 characters.</p>
-          } @else {
-            <p class="field-hint">At least 8 characters. You will use this email and password to sign in.</p>
-          }
         </div>
       }
 
       @if (error()) {
-        <p class="alert-danger">{{ error() }}</p>
+        <div class="rounded-lg border border-danger/20 bg-danger/10 p-3.5 text-xs font-medium text-danger">
+          {{ error() }}
+        </div>
       }
 
-      <div class="form-actions">
+      <!-- Form Actions (Back & Submit/Continue Buttons) -->
+      <div class="flex items-center justify-between gap-3 pt-4">
         @if (step() > 1) {
           <app-button type="button" variant="secondary" (click)="back()">Back</app-button>
         } @else {
-          <span></span>
+          <div></div>
         }
+
         @if (step() < 4) {
           <app-button type="button" (click)="next()">Continue</app-button>
         } @else {
@@ -256,9 +317,9 @@
       </div>
     </form>
 
-    <p class="auth-switch">
+    <p class="border-t border-surface-border pt-4 text-center text-xs text-ink-muted">
       Already have an account?
-      <a routerLink="/login">Sign in</a>
+      <a routerLink="/login" class="font-semibold text-accent hover:underline">Sign in</a>
     </p>
   </div>
 </app-auth-shell>
