@@ -43,20 +43,20 @@
                 <span
                   class="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium"
                   [ngClass]="{
-                    'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300':
+                    'bg-success-soft text-success-ink':
                       todaysRecord() && !todaysRecord()?.checkOutAt,
-                    'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300':
+                    'bg-warning-soft text-warning-ink':
                       todaysRecord()?.checkOutAt,
-                    'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300':
+                    'bg-surface-muted text-ink-secondary':
                       !todaysRecord(),
                   }">
                   <span
                     class="mr-1.5 h-2 w-2 rounded-full"
                     [ngClass]="{
-                      'bg-emerald-500 animate-pulse':
+                      'bg-success animate-pulse':
                         todaysRecord() && !todaysRecord()?.checkOutAt,
-                      'bg-amber-500': todaysRecord()?.checkOutAt,
-                      'bg-gray-400': !todaysRecord(),
+                      'bg-warning': todaysRecord()?.checkOutAt,
+                      'bg-neutral-dot': !todaysRecord(),
                     }"></span>
                   {{
                     todaysRecord() && !todaysRecord()?.checkOutAt
@@ -83,7 +83,7 @@
                 class="block text-[10px] font-semibold tracking-wider text-ink-muted uppercase">
                 Time Timer Reading
               </span>
-              <span class="font-mono text-lg font-bold text-brand-green">
+              <span class="font-mono text-lg font-bold text-accent-ink">
                 {{ elapsedTimeReading() }}
               </span>
               <p class="text-[11px] text-ink-muted">
@@ -106,7 +106,7 @@
               } @else if (!todaysRecord()!.checkOutAt) {
                 <app-button
                   [fullWidth]="true"
-                  tone="danger"
+                  variant="danger"
                   [loading]="submitting()"
                   (click)="checkOut()">
                   Check Out
@@ -150,8 +150,8 @@
       <nav class="-mb-px flex space-x-6">
         <button
           (click)="activeTab.set('attendance')"
-          [class.border-brand-green]="activeTab() === 'attendance'"
-          [class.text-brand-green]="activeTab() === 'attendance'"
+          [class.border-accent]="activeTab() === 'attendance'"
+          [class.text-accent-ink]="activeTab() === 'attendance'"
           [class.border-transparent]="activeTab() !== 'attendance'"
           [class.text-ink-muted]="activeTab() !== 'attendance'"
           class="border-b-2 py-3 text-xs font-semibold hover:text-ink transition-colors flex items-center gap-2">
@@ -171,8 +171,8 @@
 
         <button
           (click)="activeTab.set('profile')"
-          [class.border-brand-green]="activeTab() === 'profile'"
-          [class.text-brand-green]="activeTab() === 'profile'"
+          [class.border-accent]="activeTab() === 'profile'"
+          [class.text-accent-ink]="activeTab() === 'profile'"
           [class.border-transparent]="activeTab() !== 'profile'"
           [class.text-ink-muted]="activeTab() !== 'profile'"
           class="border-b-2 py-3 text-xs font-semibold hover:text-ink transition-colors flex items-center gap-2">
@@ -192,8 +192,8 @@
 
         <button
           (click)="activeTab.set('security')"
-          [class.border-brand-green]="activeTab() === 'security'"
-          [class.text-brand-green]="activeTab() === 'security'"
+          [class.border-accent]="activeTab() === 'security'"
+          [class.text-accent-ink]="activeTab() === 'security'"
           [class.border-transparent]="activeTab() !== 'security'"
           [class.text-ink-muted]="activeTab() !== 'security'"
           class="border-b-2 py-3 text-xs font-semibold hover:text-ink transition-colors flex items-center gap-2">
@@ -217,8 +217,8 @@
         ) {
           <button
             (click)="activeTab.set('admin')"
-            [class.border-brand-green]="activeTab() === 'admin'"
-            [class.text-brand-green]="activeTab() === 'admin'"
+            [class.border-accent]="activeTab() === 'admin'"
+            [class.text-accent-ink]="activeTab() === 'admin'"
             [class.border-transparent]="activeTab() !== 'admin'"
             [class.text-ink-muted]="activeTab() !== 'admin'"
             class="border-b-2 py-3 text-xs font-semibold hover:text-ink transition-colors flex items-center gap-2">
@@ -246,7 +246,7 @@
           class="block lg:col-span-1">
           @if (attendanceError()) {
             <p
-              class="mb-3 rounded-lg bg-red-50 p-2.5 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+              class="mb-3 alert-danger">
               {{ attendanceError() }}
             </p>
           }
@@ -291,9 +291,9 @@
               needsCheckoutReason()
             ) {
               <div
-                class="space-y-2 rounded-lg bg-amber-500/10 p-3 border border-amber-500/20">
+                class="space-y-2 rounded-lg border border-line bg-warning-soft p-3">
                 <p
-                  class="text-xs font-medium text-amber-700 dark:text-amber-300">
+                  class="text-xs font-medium text-warning-ink">
                   Off-window Check-out (Outside 5–6 PM WAT):
                 </p>
                 <select
@@ -332,7 +332,7 @@
             } @else if (!todaysRecord()!.checkOutAt) {
               <app-button
                 [fullWidth]="true"
-                tone="danger"
+                variant="danger"
                 [loading]="submitting()"
                 (click)="checkOut()">
                 Check Out Now
@@ -346,7 +346,7 @@
                   <app-badge tone="warning" class="ml-1">Left Early</app-badge>
                 }
                 @if (todaysRecord()!.reviewStatus === "PENDING_REVIEW") {
-                  <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+                  <p class="mt-2 text-xs text-warning-ink">
                     Awaiting review by HR manager.
                   </p>
                 }
@@ -453,13 +453,13 @@
 
             @if (error()) {
               <p
-                class="rounded-lg bg-red-50 p-2.5 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+                class="alert-danger">
                 {{ error() }}
               </p>
             }
             @if (savedMessage()) {
               <p
-                class="rounded-lg bg-green-50 p-2.5 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                class="alert-success">
                 {{ savedMessage() }}
               </p>
             }
@@ -533,13 +533,13 @@
 
             @if (passwordError()) {
               <p
-                class="rounded-lg bg-red-50 p-2.5 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+                class="alert-danger">
                 {{ passwordError() }}
               </p>
             }
             @if (passwordSaved()) {
               <p
-                class="rounded-lg bg-green-50 p-2.5 text-xs text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                class="alert-success">
                 Password changed successfully.
               </p>
             }

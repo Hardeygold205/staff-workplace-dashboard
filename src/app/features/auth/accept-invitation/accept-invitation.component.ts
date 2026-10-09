@@ -4,11 +4,12 @@ import { FormBuilder, ReactiveFormsModule, Validators } from "@angular/forms";
 import { ActivatedRoute, Router, RouterLink } from "@angular/router";
 import { AuthService } from "../../../core/services/auth.service";
 import { ButtonComponent } from "../../../shared/ui/button/button.component";
+import { AuthShellComponent } from "../auth-shell/auth-shell.component";
 
 @Component({
   selector: "app-accept-invitation",
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, RouterLink],
+  imports: [CommonModule, ReactiveFormsModule, ButtonComponent, RouterLink, AuthShellComponent],
   templateUrl: "./accept-invitation.component.html",
 })
 export class AcceptInvitationComponent {
@@ -19,6 +20,7 @@ export class AcceptInvitationComponent {
 
   submitting = signal(false);
   error = signal<string | null>(null);
+  showPassword = signal(false);
 
   form = this.fb.nonNullable.group({
     token: [this.route.snapshot.queryParamMap.get("token") ?? "", Validators.required],

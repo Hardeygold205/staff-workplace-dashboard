@@ -216,18 +216,15 @@ export class CalendarComponent implements OnInit {
       "relative min-h-20 rounded-lg border p-1.5 text-left transition-colors";
     const map: Record<DayStatus, string> = {
       WEEKEND: "border-line bg-surface-muted opacity-50",
-      PRESENT:
-        "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-900/20",
-      LATE: "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-900/20",
-      HALF_DAY:
-        "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-900/20",
-      LEAVE:
-        "border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-900/20",
-      ABSENT: "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-900/20",
+      PRESENT: "cal-present",
+      LATE: "cal-late",
+      HALF_DAY: "cal-late",
+      LEAVE: "cal-leave",
+      ABSENT: "cal-absent",
       PENDING: "border-line bg-surface",
       UPCOMING: "border-line bg-surface",
       EXEMPT:
-        "border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-900/10",
+        "cal-exempt",
     };
     return `${base} ${map[cell.status]}`;
   }

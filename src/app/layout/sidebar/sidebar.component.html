@@ -6,16 +6,8 @@
     @if (!sidebar.collapsed()) {
       @if (organizations.current()?.logoUrl) {
         <img [src]="organizations.current()!.logoUrl!" [alt]="organizations.current()!.name" class="h-10 w-auto" />
-      } @else if (theme.theme() === "dark") {
-        <img
-          src="assets/logo-light.svg"
-          alt="Workplace"
-          class="h-10 w-auto" />
       } @else {
-        <img
-          src="assets/logo.svg"
-          alt="Workplace"
-          class="h-10 w-auto" />
+        <img [src]="theme.logoSrc()" alt="Workplace" class="h-10 w-auto" />
       }
     } @else {
       <img
@@ -30,10 +22,10 @@
       @if (canSee(item)) {
         <a
           [routerLink]="item.route"
-          routerLinkActive="bg-brand-green text-white"
+          routerLinkActive="is-active"
           [routerLinkActiveOptions]="{ exact: item.exact ?? false }"
-          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-ink-secondary transition hover:bg-surface-muted"
-          [class.justify-center]="sidebar.collapsed()"
+          class="nav-link"
+          [class.nav-link-compact]="sidebar.collapsed()"
           [title]="sidebar.collapsed() ? item.label : ''">
           <svg
             class="h-5 w-5 shrink-0"

@@ -51,14 +51,14 @@
               <div class="mt-1.5 space-y-1">
                 @for (event of cell.events.slice(0, 1); track event.id) {
                   <p
-                    class="truncate rounded bg-brand-cream/80 px-1 py-0.5 text-[10px] font-medium text-brand-green border border-brand-cream">
-                    📅 {{ event.title }}
+                    class="truncate rounded border border-accent-soft bg-accent-soft px-1 py-0.5 text-[10px] font-medium text-accent-ink">
+                    {{ event.title }}
                   </p>
                 }
                 @for (item of cell.items.slice(0, 1); track item.id) {
                   <p
-                    class="truncate rounded bg-blue-100/80 px-1 py-0.5 text-[10px] font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-200">
-                    📌 {{ item.title }}
+                    class="truncate rounded border border-info-soft bg-info-soft px-1 py-0.5 text-[10px] font-medium text-info-ink">
+                    {{ item.title }}
                   </p>
                 }
                 @if (cell.events.length + cell.items.length > 1) {
@@ -78,13 +78,13 @@
                   </p>
                   <ul class="space-y-1 max-h-32 overflow-y-auto">
                     @for (e of cell.events; track e.id) {
-                      <li class="text-[10px] text-brand-green font-medium">
+                      <li class="text-[10px] text-accent-ink font-medium">
                         • {{ e.title }}
                       </li>
                     }
                     @for (i of cell.items; track i.id) {
                       <li
-                        class="text-[10px] text-blue-600 dark:text-blue-400 font-medium">
+                        class="text-[10px] font-medium text-info-ink">
                         • {{ i.title }} ({{ i.type }})
                       </li>
                     }
@@ -99,17 +99,17 @@
       <!-- Legend -->
       <div class="mt-4 flex flex-wrap gap-3 text-xs text-ink-secondary">
         <span class="flex items-center gap-1">
-          <span class="h-2.5 w-2.5 rounded-full bg-green-400"></span> Present
+          <span class="h-2.5 w-2.5 rounded-full bg-success"></span> Present
         </span>
         <span class="flex items-center gap-1">
-          <span class="h-2.5 w-2.5 rounded-full bg-amber-400"></span> Late /
+          <span class="h-2.5 w-2.5 rounded-full bg-warning"></span> Late /
           Half Day
         </span>
         <span class="flex items-center gap-1">
-          <span class="h-2.5 w-2.5 rounded-full bg-blue-400"></span> Leave
+          <span class="h-2.5 w-2.5 rounded-full bg-info"></span> Leave
         </span>
         <span class="flex items-center gap-1">
-          <span class="h-2.5 w-2.5 rounded-full bg-red-400"></span> Absent
+          <span class="h-2.5 w-2.5 rounded-full bg-danger"></span> Absent
         </span>
         <span class="flex items-center gap-1">
           <span

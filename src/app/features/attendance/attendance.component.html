@@ -7,7 +7,7 @@
   <app-card title="Today" class="block lg:col-span-1">
     @if (isExempt()) {
       <div
-        class="flex items-start gap-2 rounded-lg bg-brand-cream px-3 py-3 text-brand-green">
+        class="flex items-start gap-2 rounded-lg bg-accent-soft px-3 py-3 text-accent-ink">
         <svg
           class="mt-0.5 h-4 w-4 shrink-0"
           fill="none"
@@ -31,7 +31,7 @@
     } @else {
       @if (error()) {
         <p
-          class="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+          class="mb-3 alert-danger">
           {{ error() }}
         </p>
       }
@@ -113,7 +113,7 @@
             <app-badge tone="danger">Auto-checked-out</app-badge>
           }
           @if (todaysRecord()!.reviewStatus === "PENDING_REVIEW") {
-            <p class="mt-2 text-xs text-amber-600 dark:text-amber-400">
+            <p class="mt-2 text-xs text-warning-ink">
               Awaiting review by HR.
             </p>
           }

@@ -3,7 +3,7 @@
 } @else {
   <div class="mb-6">
     <h1 class="text-xl font-semibold text-ink">
-      Welcome back{{ me() ? ", " + me()!.firstName : "" }} 👋
+      Welcome back{{ me() ? ", " + me()!.firstName : "" }}
     </h1>
     <p class="mt-1 text-sm text-ink-secondary">
       Here's what's happening today.
@@ -36,7 +36,7 @@
         } @else {
           <a
             routerLink="/attendance"
-            class="mt-3 inline-block text-xs font-medium text-brand-green hover:underline">
+            class="mt-3 inline-block text-xs font-medium text-accent-ink hover:underline">
             Go check out →
           </a>
         }
@@ -44,7 +44,7 @@
         <p class="text-sm text-ink-secondary">You haven't checked in today.</p>
         <a
           routerLink="/attendance"
-          class="mt-2 inline-block text-xs font-medium text-brand-green hover:underline">
+          class="mt-2 inline-block text-xs font-medium text-accent-ink hover:underline">
           Check in now →
         </a>
       }
@@ -60,7 +60,7 @@
       </div>
       <a
         routerLink="/requests"
-        class="mt-3 inline-block text-xs font-medium text-brand-green hover:underline">
+        class="mt-3 inline-block text-xs font-medium text-accent-ink hover:underline">
         View all requests →
       </a>
     </app-card>
@@ -83,7 +83,7 @@
       }
       <a
         routerLink="/calendar"
-        class="mt-3 inline-block text-xs font-medium text-brand-green hover:underline">
+        class="mt-3 inline-block text-xs font-medium text-accent-ink hover:underline">
         View calendar →
       </a>
     </app-card>

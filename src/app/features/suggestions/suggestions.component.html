@@ -39,10 +39,10 @@
               (click)="vote(s, 'LIKE')"
               class="flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-xs font-medium text-ink transition hover:bg-surface-muted"
               [ngClass]="{
-                'border-emerald-500 bg-emerald-500/10 text-emerald-600':
+                'border-success bg-success-soft text-success-ink':
                   s.myVote === 'LIKE',
               }">
-              👍 <span>{{ s.likes }}</span>
+              Like <span>{{ s.likes }}</span>
             </button>
 
             <button
@@ -50,10 +50,10 @@
               (click)="vote(s, 'DISLIKE')"
               class="flex items-center gap-1 rounded-lg border border-line px-2 py-1 text-xs font-medium text-ink transition hover:bg-surface-muted"
               [ngClass]="{
-                'border-rose-500 bg-rose-500/10 text-rose-600':
+                'border-danger bg-danger-soft text-danger-ink':
                   s.myVote === 'DISLIKE',
               }">
-              👎 <span>{{ s.dislikes }}</span>
+              Dislike <span>{{ s.dislikes }}</span>
             </button>
           </div>
 
@@ -114,7 +114,7 @@
 
     @if (error()) {
       <p
-        class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
+        class="alert-danger">
         {{ error() }}
       </p>
     }

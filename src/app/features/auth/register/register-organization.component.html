@@ -1,202 +1,264 @@
-<div class="min-h-screen bg-white px-4 py-10 dark:bg-black">
-  <div class="mx-auto w-full max-w-2xl">
-    <div class="mb-8 flex justify-center">
-      @if (theme.theme() === "dark") {
-        <img src="assets/logo-light.svg" alt="Workplace" class="h-10 w-auto" />
-      } @else {
-        <img src="assets/logo.svg" alt="Workplace" class="h-10 w-auto" />
+<app-auth-shell
+  headline="Open a workplace for your organization."
+  lede="You become the owner. Staff join later by invitation. Nothing on this form is billed."
+  [points]="[
+    'Name the workplace people already know',
+    'Add contact and location when you have them',
+    'Finish with the account that will administer it',
+  ]">
+  <div class="auth-form auth-form-wide">
+    <h1>
+      @switch (step()) {
+        @case (1) { What should we call the workplace? }
+        @case (2) { How can people reach the company? }
+        @case (3) { Where does the company operate? }
+        @case (4) { Create the owner account }
       }
-    </div>
-
-    <div class="rounded-2xl bg-surface-elevated p-8 shadow-xl">
-      <h1 class="text-lg font-semibold text-ink">Create your organization</h1>
-      <p class="mt-1 text-sm text-ink-secondary">
-        No payment. You become the organization owner and can add a logo, icon,
-        departments, and staff next.
-      </p>
-
-      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-6">
-        <section class="space-y-3">
-          <h2
-            class="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-            Company
-          </h2>
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Organization name</label
-              >
-              <input
-                formControlName="organizationName"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Legal name</label
-              >
-              <input
-                formControlName="legalName"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Industry</label
-              >
-              <input
-                formControlName="industry"
-                placeholder="Agriculture, Finance, Technology"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Staff size</label
-              >
-              <select
-                formControlName="staffRange"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink">
-                @for (range of staffRanges; track range) {
-                  <option [value]="range">{{ range }} people</option>
-                }
-              </select>
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Website</label
-              >
-              <input
-                formControlName="website"
-                placeholder="https://"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Phone</label
-              >
-              <input
-                formControlName="phone"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Registration number</label
-              >
-              <input
-                formControlName="registrationNumber"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Timezone</label
-              >
-              <input
-                formControlName="timezone"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-          </div>
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Country</label
-              >
-              <input
-                formControlName="country"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >State</label
-              >
-              <input
-                formControlName="state"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >City</label
-              >
-              <input
-                formControlName="city"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-          </div>
-          <div>
-            <label class="mb-1 block text-xs font-medium text-ink-secondary"
-              >Address</label
-            >
-            <input
-              formControlName="address"
-              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-          </div>
-          <div>
-            <label class="mb-1 block text-xs font-medium text-ink-secondary"
-              >About the company</label
-            >
-            <textarea
-              formControlName="about"
-              rows="3"
-              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink"></textarea>
-          </div>
-        </section>
-
-        <section class="space-y-3">
-          <h2
-            class="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-            Owner account
-          </h2>
-          <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >First name</label
-              >
-              <input
-                formControlName="ownerFirstName"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-            <div>
-              <label class="mb-1 block text-xs font-medium text-ink-secondary"
-                >Last name</label
-              >
-              <input
-                formControlName="ownerLastName"
-                class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-            </div>
-          </div>
-          <div>
-            <label class="mb-1 block text-xs font-medium text-ink-secondary"
-              >Work email</label
-            >
-            <input
-              type="email"
-              formControlName="ownerEmail"
-              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-          </div>
-          <div>
-            <label class="mb-1 block text-xs font-medium text-ink-secondary"
-              >Password</label
-            >
-            <input
-              type="password"
-              formControlName="ownerPassword"
-              class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-          </div>
-        </section>
-
-        @if (error()) {
-          <p
-            class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
-            {{ error() }}
-          </p>
+    </h1>
+    <p class="auth-form-lede">
+      @switch (step()) {
+        @case (1) {
+          This is the name staff see on invitations, attendance, and the
+          sidebar. The legal name can differ. You can change either later.
         }
+        @case (2) {
+          Optional. Add a website, phone, registration number, and timezone
+          so invitations and records stay accurate.
+        }
+        @case (3) {
+          Set the primary office. Branches can be added after you sign in. A
+          short description helps new staff recognize the organization.
+        }
+        @case (4) {
+          This account administers staff, roles, attendance, and settings.
+          You will sign in with this work email. Other admins can be invited
+          once you are inside.
+        }
+      }
+    </p>
 
-        <app-button type="submit" [fullWidth]="true" [loading]="submitting()"
-          >Create organization</app-button
-        >
-      </form>
-    </div>
+    <ol class="stepper" aria-label="Setup progress">
+      @for (item of steps; track item.id) {
+        <li [class.is-current]="step() === item.id" [class.is-done]="step() > item.id">
+          <button type="button" (click)="goTo(item.id)">
+            <span class="step-track"></span>
+            <span class="step-label">{{ item.id }}. {{ item.label }}</span>
+          </button>
+        </li>
+      }
+    </ol>
 
-    <p class="mt-6 text-center text-xs text-ink-muted">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="field-stack" novalidate>
+      @if (step() === 1) {
+        <div>
+          <label class="field-label" for="organizationName">Organization name</label>
+          <input
+            id="organizationName"
+            formControlName="organizationName"
+            autocomplete="organization"
+            placeholder="Extension Africa"
+            class="field" />
+          @if (showError('organizationName')) {
+            <p class="field-error">Enter the name staff will see. At least 2 characters.</p>
+          }
+        </div>
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="legalName">Legal name</label>
+            <input
+              id="legalName"
+              formControlName="legalName"
+              autocomplete="organization"
+              placeholder="If it differs from the workplace name"
+              class="field" />
+          </div>
+          <div>
+            <label class="field-label" for="industry">Industry</label>
+            <input
+              id="industry"
+              formControlName="industry"
+              placeholder="Agriculture, finance, technology"
+              class="field" />
+          </div>
+          <div class="span-2">
+            <label class="field-label" for="staffRange">Staff size</label>
+            <select id="staffRange" formControlName="staffRange" class="field">
+              @for (range of staffRanges; track range) {
+                <option [value]="range">{{ range }} people</option>
+              }
+            </select>
+            <p class="field-hint">An estimate is enough. It is not a seat limit.</p>
+          </div>
+        </div>
+      }
+
+      @if (step() === 2) {
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="website">Website</label>
+            <input
+              id="website"
+              formControlName="website"
+              inputmode="url"
+              autocomplete="url"
+              placeholder="https://"
+              class="field" />
+          </div>
+          <div>
+            <label class="field-label" for="phone">Phone</label>
+            <input
+              id="phone"
+              formControlName="phone"
+              type="tel"
+              autocomplete="tel"
+              placeholder="+234"
+              class="field" />
+          </div>
+          <div>
+            <label class="field-label" for="registrationNumber">Registration number</label>
+            <input
+              id="registrationNumber"
+              formControlName="registrationNumber"
+              placeholder="CAC or equivalent"
+              class="field" />
+          </div>
+          <div>
+            <label class="field-label" for="timezone">Timezone</label>
+            <select id="timezone" formControlName="timezone" class="field">
+              @for (zone of timezones; track zone) {
+                <option [value]="zone">{{ zone }}</option>
+              }
+            </select>
+            <p class="field-hint">Attendance windows use this timezone.</p>
+          </div>
+        </div>
+      }
+
+      @if (step() === 3) {
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="country">Country</label>
+            <input id="country" formControlName="country" autocomplete="country-name" class="field" />
+          </div>
+          <div>
+            <label class="field-label" for="state">State</label>
+            <input id="state" formControlName="state" autocomplete="address-level1" class="field" />
+          </div>
+          <div>
+            <label class="field-label" for="city">City</label>
+            <input id="city" formControlName="city" autocomplete="address-level2" class="field" />
+          </div>
+          <div>
+            <label class="field-label" for="address">Street address</label>
+            <input id="address" formControlName="address" autocomplete="street-address" class="field" />
+          </div>
+        </div>
+        <div>
+          <label class="field-label" for="about">About the company</label>
+          <textarea
+            id="about"
+            formControlName="about"
+            rows="4"
+            placeholder="What the organization does, in a sentence or two."
+            class="field"></textarea>
+          <p class="field-hint">Shown to staff when they join. You can leave this blank.</p>
+        </div>
+      }
+
+      @if (step() === 4) {
+        <p class="field-hint">
+          Creating
+          <strong class="text-ink">{{ form.controls.organizationName.value }}</strong>.
+          This person is the organization owner.
+        </p>
+        <div class="field-grid">
+          <div>
+            <label class="field-label" for="ownerFirstName">First name</label>
+            <input
+              id="ownerFirstName"
+              formControlName="ownerFirstName"
+              autocomplete="given-name"
+              class="field" />
+            @if (showError('ownerFirstName')) {
+              <p class="field-error">Enter the owner's first name.</p>
+            }
+          </div>
+          <div>
+            <label class="field-label" for="ownerLastName">Last name</label>
+            <input
+              id="ownerLastName"
+              formControlName="ownerLastName"
+              autocomplete="family-name"
+              class="field" />
+            @if (showError('ownerLastName')) {
+              <p class="field-error">Enter the owner's last name.</p>
+            }
+          </div>
+        </div>
+        <div>
+          <label class="field-label" for="ownerEmail">Work email</label>
+          <input
+            id="ownerEmail"
+            type="email"
+            formControlName="ownerEmail"
+            autocomplete="email"
+            placeholder="you@company.com"
+            class="field" />
+          @if (showError('ownerEmail')) {
+            <p class="field-error">
+              {{
+                form.controls.ownerEmail.hasError('email')
+                  ? 'That email does not look valid.'
+                  : 'Enter the work email for this account.'
+              }}
+            </p>
+          }
+        </div>
+        <div>
+          <label class="field-label" for="ownerPassword">Password</label>
+          <div class="field-affix">
+            <input
+              id="ownerPassword"
+              [type]="showPassword() ? 'text' : 'password'"
+              formControlName="ownerPassword"
+              autocomplete="new-password"
+              class="field" />
+            <button
+              type="button"
+              class="field-affix-btn"
+              (click)="showPassword.set(!showPassword())">
+              {{ showPassword() ? 'Hide' : 'Show' }}
+            </button>
+          </div>
+          @if (showError('ownerPassword')) {
+            <p class="field-error">Use at least 8 characters.</p>
+          } @else {
+            <p class="field-hint">At least 8 characters. You will use this email and password to sign in.</p>
+          }
+        </div>
+      }
+
+      @if (error()) {
+        <p class="alert-danger">{{ error() }}</p>
+      }
+
+      <div class="form-actions">
+        @if (step() > 1) {
+          <app-button type="button" variant="secondary" (click)="back()">Back</app-button>
+        } @else {
+          <span></span>
+        }
+        @if (step() < 4) {
+          <app-button type="button" (click)="next()">Continue</app-button>
+        } @else {
+          <app-button type="submit" [loading]="submitting()">Create organization</app-button>
+        }
+      </div>
+    </form>
+
+    <p class="auth-switch">
       Already have an account?
-      <a routerLink="/login" class="font-medium text-brand-green">Sign in</a>
+      <a routerLink="/login">Sign in</a>
     </p>
   </div>
-</div>
+</app-auth-shell>

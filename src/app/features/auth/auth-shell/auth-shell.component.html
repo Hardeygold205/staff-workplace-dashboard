@@ -1,0 +1,34 @@
+<div class="auth-frame">
+  <aside class="auth-visual">
+    <img src="assets/auth-visual.jpg" alt="" class="auth-visual-photo" />
+    <div class="auth-visual-copy">
+      <img
+        src="assets/logo-light.svg"
+        alt="Workplace"
+        class="auth-visual-logo" />
+      <h2>{{ headline }}</h2>
+      <p class="auth-lede">{{ lede }}</p>
+      <ul>
+        @for (point of points; track point) {
+          <li>{{ point }}</li>
+        }
+      </ul>
+      <p class="auth-photo-credit">Photograph via Unsplash</p>
+    </div>
+  </aside>
+
+  <section class="auth-pane">
+    <header class="auth-pane-bar">
+      <img
+        [src]="theme.logoSrc()"
+        alt="Workplace"
+        class="auth-pane-logo lg:hidden" />
+      <div class="ml-auto">
+        <app-theme-switcher />
+      </div>
+    </header>
+    <div class="auth-pane-body">
+      <ng-content />
+    </div>
+  </section>
+</div>

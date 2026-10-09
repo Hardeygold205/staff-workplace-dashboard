@@ -3,7 +3,7 @@
 </app-page-header>
 
 @if (notice()) {
-  <p class="mb-4 rounded-lg bg-brand-cream px-3 py-2 text-sm text-brand-green">{{ notice() }}</p>
+  <p class="mb-4 rounded-lg bg-accent-soft px-3 py-2 text-sm text-accent-ink">{{ notice() }}</p>
 }
 
 @if (loading()) {
@@ -75,7 +75,7 @@
       </select>
     </div>
     @if (error()) {
-      <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+      <p class="alert-danger">{{ error() }}</p>
     }
     <app-button type="submit" [fullWidth]="true" [loading]="saving()">Send invitation</app-button>
   </form>

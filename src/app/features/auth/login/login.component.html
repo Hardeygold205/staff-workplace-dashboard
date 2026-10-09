@@ -1,60 +1,62 @@
-<div class="flex min-h-screen items-center justify-center bg-white dark:bg-black px-4 ">
-  <div class="w-full max-w-sm overflow-y-auto">
-    <div class="mb-8 flex justify-center">
-      @if (theme.theme() === "dark") {
-        <img src="assets/logo-light.svg" alt="Workplace" class="h-10 w-auto" />
-      } @else {
-        <img src="assets/logo.svg" alt="Workplace" class="h-10 w-auto" />
-      }
-    </div>
+<app-auth-shell>
+  <div class="auth-form">
+    <h1>Sign in</h1>
+    <p class="auth-form-lede">
+      Use the work email on your invitation, or the owner email you used when
+      the organization was created.
+    </p>
 
-    <div class="rounded-2xl bg-surface-elevated p-8 shadow-xl">
-      <h1 class="text-lg font-semibold text-ink">Welcome back</h1>
-      <p class="mt-1 text-sm text-ink-secondary">
-        Sign in to your workplace account.
-      </p>
-
-      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
-        <div>
-          <label class="mb-1 block text-xs font-medium text-ink-secondary"
-            >Work email</label
-          >
-          <input
-            type="email"
-            formControlName="email"
-            placeholder="you@company.com"
-            class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green" />
-        </div>
-
-        <div>
-          <label class="mb-1 block text-xs font-medium text-ink-secondary"
-            >Password</label
-          >
-          <input
-            type="password"
-            formControlName="password"
-            class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink outline-none focus:border-brand-green focus:ring-1 focus:ring-brand-green" />
-        </div>
-
-        @if (error()) {
-          <p
-            class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700 dark:bg-red-900/30 dark:text-red-300">
-            {{ error() }}
-          </p>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="field-stack" novalidate>
+      <div>
+        <label class="field-label" for="email">Work email</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          placeholder="you@company.com"
+          class="field" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <p class="field-error">Enter a valid work email.</p>
         }
+      </div>
 
-        <app-button type="submit" [fullWidth]="true" [loading]="submitting()"
-          >Sign in</app-button
-        >
-      </form>
-    </div>
+      <div>
+        <label class="field-label" for="password">Password</label>
+        <div class="field-affix">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            class="field" />
+          <button
+            type="button"
+            class="field-affix-btn"
+            (click)="showPassword.set(!showPassword())">
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="field-error">Enter your password.</p>
+        }
+      </div>
 
-    <p class="mt-6 text-center text-xs text-ink-muted">
-      Have an invite?
-      <a routerLink="/accept-invitation" class="font-medium text-brand-green">Accept it</a>
+      @if (error()) {
+        <p class="alert-danger">{{ error() }}</p>
+      }
+
+      <app-button type="submit" [fullWidth]="true" [loading]="submitting()">
+        Sign in
+      </app-button>
+    </form>
+
+    <p class="auth-switch">
+      Have an invitation?
+      <a routerLink="/accept-invitation">Accept it and join</a>
       <br />
       Setting up a company?
-      <a routerLink="/register" class="font-medium text-brand-green">Create an organization</a>
+      <a routerLink="/register">Create an organization</a>
     </p>
   </div>
-</div>
+</app-auth-shell>

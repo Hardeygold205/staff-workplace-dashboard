@@ -1,22 +1,21 @@
 import { Component, OnInit, inject, signal, effect } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { Router, RouterLink } from "@angular/router";
-import { ThemeService } from "../../core/services/theme.service";
 import { SidebarService } from "../../core/services/sidebar.service";
 import { AuthService } from "../../core/services/auth.service";
 import { NotificationsService } from "../../core/services/notifications.service";
 import { UsersService } from "../../core/services/users.service";
 import { User, displayName, initials } from "../../core/models/user.model";
 import { AvatarComponent } from "../../shared/ui/avatar/avatar.component";
+import { ThemeSwitcherComponent } from "../../shared/ui/theme-switcher/theme-switcher.component";
 
 @Component({
   selector: "app-topbar",
   standalone: true,
-  imports: [CommonModule, RouterLink, AvatarComponent],
+  imports: [CommonModule, RouterLink, AvatarComponent, ThemeSwitcherComponent],
   templateUrl: "./topbar.component.html",
 })
 export class TopbarComponent implements OnInit {
-  theme = inject(ThemeService);
   sidebar = inject(SidebarService);
   auth = inject(AuthService);
   notifications = inject(NotificationsService);

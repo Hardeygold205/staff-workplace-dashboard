@@ -1,4 +1,4 @@
-<a routerLink="/projects" class="mb-3 inline-block text-xs font-medium text-brand-green">Back to projects</a>
+<a routerLink="/projects" class="mb-3 inline-block text-xs font-medium text-accent-ink">Back to projects</a>
 
 @if (loading()) {
   <app-spinner />
@@ -25,7 +25,7 @@
     </div>
 
     @if (error()) {
-      <p class="mb-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+      <p class="mb-3 alert-danger">{{ error() }}</p>
     }
 
     <div class="overflow-x-auto rounded-xl border border-line bg-surface-elevated">
@@ -70,7 +70,7 @@
                 <input type="date" [value]="dueValue(task)" (change)="setDue(task, $any($event.target).value)" class="rounded border border-transparent bg-transparent px-1 py-1 text-xs text-ink hover:border-line" />
               </td>
               <td class="border-b border-line px-3 py-2 text-right">
-                <button type="button" class="text-xs text-red-500" (click)="deleteTask(task)">Remove</button>
+                <button type="button" class="text-xs text-danger" (click)="deleteTask(task)">Remove</button>
               </td>
             </tr>
           }

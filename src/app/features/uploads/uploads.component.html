@@ -88,7 +88,7 @@
 
   <label
     class="flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition"
-    [class.border-brand-green]="dragOver()"
+    [class.border-accent]="dragOver()"
     [class.border-line]="!dragOver()"
     (dragover)="$event.preventDefault(); dragOver.set(true)"
     (dragleave)="dragOver.set(false)"
@@ -103,12 +103,12 @@
     </p>
     <p class="mt-1 text-xs text-ink-muted">Docs, images, audio, and video</p>
     @if (uploading()) {
-      <p class="mt-2 text-xs text-brand-green">Uploading…</p>
+      <p class="mt-2 text-xs text-accent-ink">Uploading…</p>
     }
   </label>
 
   @if (error()) {
-    <p class="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+    <p class="mt-3 alert-danger">
       {{ error() }}
     </p>
   }
@@ -118,7 +118,7 @@
   @if (loading()) {
     <app-spinner />
   } @else if (loadError()) {
-    <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">
+    <p class="alert-danger">
       {{ loadError() }}
     </p>
   } @else if (uploads().length === 0) {
@@ -141,7 +141,7 @@
             <button
               type="button"
               (click)="download(file)"
-              class="text-xs font-medium text-brand-green hover:underline">
+              class="text-xs font-medium text-accent-ink hover:underline">
               Download
             </button>
             <button
@@ -153,7 +153,7 @@
             <button
               type="button"
               (click)="remove(file)"
-              class="text-xs font-medium text-red-500 hover:underline">
+              class="text-xs font-medium text-danger hover:underline">
               Delete
             </button>
           </div>
@@ -165,7 +165,7 @@
 
 @if (viewing(); as file) {
   <div
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-overlay p-4"
     (click)="closeViewer()">
     <div
       class="flex h-[85vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl bg-surface"
@@ -179,7 +179,7 @@
           <button
             type="button"
             (click)="download(file)"
-            class="text-xs font-medium text-brand-green hover:underline">
+            class="text-xs font-medium text-accent-ink hover:underline">
             Download
           </button>
           <button
@@ -201,7 +201,7 @@
         @if (viewLoading()) {
           <app-spinner />
         } @else if (viewError()) {
-          <p class="p-4 text-sm text-red-700">{{ viewError() }}</p>
+          <p class="p-4 text-sm text-danger">{{ viewError() }}</p>
         } @else {
           @switch (viewKind()) {
             @case ("image") {

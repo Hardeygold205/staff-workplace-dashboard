@@ -8,7 +8,7 @@ import { Component, Input } from '@angular/core';
       <img [src]="src" [alt]="name" class="rounded-full object-cover" [style.width.px]="size" [style.height.px]="size" />
     } @else {
       <div
-        class="flex items-center justify-center rounded-full bg-brand-green font-semibold text-white"
+        class="flex items-center justify-center rounded-full bg-accent font-semibold text-accent-contrast"
         [style.width.px]="size"
         [style.height.px]="size"
         [style.fontSize.px]="size / 2.4"

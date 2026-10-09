@@ -10,8 +10,8 @@
       <button
         type="button"
         (click)="switchViewMode('ALL')"
-        [class.bg-brand-cream]="viewMode() === 'ALL'"
-        [class.text-brand-green]="viewMode() === 'ALL'"
+        [class.bg-accent-soft]="viewMode() === 'ALL'"
+        [class.text-accent-ink]="viewMode() === 'ALL'"
         [class.text-ink-secondary]="viewMode() !== 'ALL'"
         class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors hover:text-ink">
         All Staff Activity
@@ -19,8 +19,8 @@
       <button
         type="button"
         (click)="switchViewMode('MINE')"
-        [class.bg-brand-cream]="viewMode() === 'MINE'"
-        [class.text-brand-green]="viewMode() === 'MINE'"
+        [class.bg-accent-soft]="viewMode() === 'MINE'"
+        [class.text-accent-ink]="viewMode() === 'MINE'"
         [class.text-ink-secondary]="viewMode() !== 'MINE'"
         class="rounded-md px-3 py-1.5 text-xs font-semibold transition-colors hover:text-ink">
         My Activity

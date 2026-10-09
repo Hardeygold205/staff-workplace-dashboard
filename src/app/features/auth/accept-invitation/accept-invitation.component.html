@@ -1,39 +1,75 @@
-<div class="flex min-h-screen items-center justify-center bg-white px-4 dark:bg-black">
-  <div class="w-full max-w-sm">
-    <div class="mb-8 flex justify-center">
-      <img src="assets/logo.svg" alt="Workplace" class="h-10 w-auto" />
-    </div>
-    <div class="rounded-2xl bg-surface-elevated p-8 shadow-xl">
-      <h1 class="text-lg font-semibold text-ink">Accept invitation</h1>
-      <p class="mt-1 text-sm text-ink-secondary">Create your staff account for this organization.</p>
-      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4">
-        <div>
-          <label class="mb-1 block text-xs font-medium text-ink-secondary">Invitation token</label>
-          <input formControlName="token" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="mb-1 block text-xs font-medium text-ink-secondary">First name</label>
-            <input formControlName="firstName" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-          </div>
-          <div>
-            <label class="mb-1 block text-xs font-medium text-ink-secondary">Last name</label>
-            <input formControlName="lastName" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-          </div>
-        </div>
-        <div>
-          <label class="mb-1 block text-xs font-medium text-ink-secondary">Password</label>
-          <input type="password" formControlName="password" class="w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm text-ink" />
-        </div>
-        @if (error()) {
-          <p class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">{{ error() }}</p>
+<app-auth-shell
+  headline="You have been invited in."
+  lede="Create your staff account with the invitation from your organization. You will sign in with this name and password afterward."
+  [points]="[
+    'Use the token from your invitation',
+    'Set the name colleagues will see',
+    'Choose a password of at least 8 characters',
+  ]">
+  <div class="auth-form">
+    <h1>Accept invitation</h1>
+    <p class="auth-form-lede">
+      This creates your staff account for the organization that invited you.
+      If you already have an account, sign in instead.
+    </p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="field-stack" novalidate>
+      <div>
+        <label class="field-label" for="token">Invitation token</label>
+        <input id="token" formControlName="token" autocomplete="off" class="field" />
+        <p class="field-hint">Paste the token from the invitation if it was not filled in for you.</p>
+        @if (form.controls.token.touched && form.controls.token.invalid) {
+          <p class="field-error">An invitation token is required.</p>
         }
-        <app-button type="submit" [fullWidth]="true" [loading]="submitting()">Join organization</app-button>
-      </form>
-    </div>
-    <p class="mt-6 text-center text-xs text-ink-muted">
+      </div>
+      <div class="field-grid">
+        <div>
+          <label class="field-label" for="firstName">First name</label>
+          <input id="firstName" formControlName="firstName" autocomplete="given-name" class="field" />
+          @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
+            <p class="field-error">Enter your first name.</p>
+          }
+        </div>
+        <div>
+          <label class="field-label" for="lastName">Last name</label>
+          <input id="lastName" formControlName="lastName" autocomplete="family-name" class="field" />
+          @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
+            <p class="field-error">Enter your last name.</p>
+          }
+        </div>
+      </div>
+      <div>
+        <label class="field-label" for="password">Password</label>
+        <div class="field-affix">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="new-password"
+            class="field" />
+          <button type="button" class="field-affix-btn" (click)="showPassword.set(!showPassword())">
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="field-error">Use at least 8 characters.</p>
+        } @else {
+          <p class="field-hint">At least 8 characters.</p>
+        }
+      </div>
+
+      @if (error()) {
+        <p class="alert-danger">{{ error() }}</p>
+      }
+
+      <app-button type="submit" [fullWidth]="true" [loading]="submitting()">
+        Join organization
+      </app-button>
+    </form>
+
+    <p class="auth-switch">
       Already have an account?
-      <a routerLink="/login" class="font-medium text-brand-green">Sign in</a>
+      <a routerLink="/login">Sign in</a>
     </p>
   </div>
-</div>
+</app-auth-shell>
